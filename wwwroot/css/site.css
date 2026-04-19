@@ -1,0 +1,354 @@
+/* --- 1. ÃËÎÁÀËÜÍÛÅ ÑÒÈËÈ È ÏĞÈÆÀÒÈÅ ÔÓÒÅĞÀ --- */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #ffffff;
+    color: #1a1a1a;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+footer {
+    flex-shrink: 0;
+    position: relative;
+    background-color: #000 !important;
+    overflow: hidden;
+    min-height: 250px;
+    z-index: 10;
+}
+
+/* --- 2. ÍÀÂÈÃÀÖÈß --- */
+.navbar {
+    background-color: #000000 !important;
+    padding: 1.2rem 0;
+    z-index: 1000;
+}
+
+.navbar-brand {
+    font-weight: 800;
+    letter-spacing: 2px;
+    font-size: 1.3rem;
+}
+
+.nav-link {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7) !important;
+}
+
+    .nav-link:hover {
+        color: #ffffff !important;
+    }
+
+/* --- 3. ÃËÀÂÍÀß ÑÒĞÀÍÈÖÀ (HERO) --- */
+.hero-section {
+    height: 90vh;
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2)), url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+}
+
+    .hero-section h1 {
+        font-size: calc(2rem + 4vw);
+        font-weight: 900;
+        letter-spacing: -2px;
+        text-transform: uppercase;
+        line-height: 0.9;
+    }
+
+/* --- 4. ÄÅÊÎĞ ÃÎĞ Â ÔÓÒÅĞÅ --- */
+.mountain-decor {
+    position: absolute;
+    bottom: -5px;
+    right: 0;
+    width: 700px;
+    height: 300px;
+    background-image: url('/images/7apexx.jpg');
+    background-repeat: no-repeat;
+    background-position: bottom right;
+    background-size: contain;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.6;
+}
+
+/* --- 5. ÎÁÙÈÅ ÑÒÈËÈ ØÀÏÊÈ ÑÒĞÀÍÈÖ (ÒÓĞÛ È ÌÀÃÀÇÈÍ) --- */
+.tour-hero {
+    position: relative;
+    z-index: 1;
+    background-color: #000;
+    padding: 130px 0 100px 0;
+    color: #fff;
+    background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920');
+    background-size: cover;
+    background-position: center;
+}
+
+.overlap-grid {
+    position: relative;
+    z-index: 100;
+    margin-top: 40px !important;
+}
+
+/* --- 6. ÏÀÍÅËÜ ÏÎÈÑÊÀ (ÌÀÃÀÇÈÍ) --- */
+.search-panel {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f0f0;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon-inner {
+    position: absolute;
+    left: 20px;
+    color: #aaa;
+    font-size: 1rem;
+    z-index: 5;
+}
+
+.search-field-custom {
+    width: 100%;
+    height: 55px;
+    padding: 10px 20px 10px 50px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    background-color: #fcfcfc;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+
+    .search-field-custom:focus {
+        outline: none;
+        border-color: #000;
+        background-color: #fff;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+.search-select-custom {
+    width: 100%;
+    height: 55px;
+    padding: 0 20px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    background-color: #fcfcfc;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='black' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+}
+
+.btn-search-main {
+    width: 100%;
+    height: 55px;
+    background-color: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: 0.3s;
+}
+
+    .btn-search-main:hover {
+        background-color: #000;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+/* --- 7. ÊÀĞÒÎ×ÊÈ ÒÎÂÀĞÎÂ È ÒÓĞÎÂ --- */
+.tour-card {
+    border: none !important;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.tour-card-img-wrap {
+    position: relative;
+    height: 280px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border-radius: 12px;
+}
+
+.shop-img {
+    background-color: #f8f8f8;
+    padding: 20px;
+}
+
+    .shop-img .tour-card-img {
+        object-fit: contain;
+    }
+
+.tour-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.tour-card:hover .tour-card-img {
+    transform: scale(1.08);
+}
+
+/* --- 8. ÈÇÁĞÀÍÍÎÅ È ÑÊÈÄÊÈ (ÍÎÂÛÉ ÁËÎÊ) --- */
+.discount-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #000;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 5px 10px;
+    z-index: 5;
+    border-radius: 5px;
+}
+
+/* Àíèìàöèÿ êíîïêè-ñåğäå÷êà */
+.favorite-form {
+    margin: 0;
+    padding: 0;
+}
+
+.btn-favorite {
+    background-color: #fff;
+    color: #1a1a1a;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    text-decoration: none;
+    opacity: 0; /* Ñêğûâàåì ïî óìîë÷àíèş */
+}
+
+/* Ïîêàçûâàåì ñåğäå÷êî òîëüêî ïğè íàâåäåíèè íà êàğòî÷êó */
+.tour-card:hover .btn-favorite {
+    opacity: 1;
+}
+
+.btn-favorite:hover {
+    background-color: #e63946; /* Êğàñíûé ôèğìåííûé öâåò */
+    color: #fff;
+    transform: scale(1.15);
+}
+
+/* Åñëè åñòü ñêèäêà, äâèãàåì ñåğäå÷êî âëåâî */
+.btn-favorite.with-discount {
+    right: 55px !important;
+}
+
+/* --- 9. ÒÈÏÎÃĞÀÔÈÊÀ È ÖÅÍÛ --- */
+.new-price {
+    color: #e63946;
+    font-weight: 800;
+    font-size: 1.15rem;
+}
+
+.old-price-small {
+    color: #adb5bd;
+    text-decoration: line-through;
+    font-size: 0.85rem;
+    margin-right: 8px;
+}
+
+.btn-tour-tan {
+    background-color: #d4b483;
+    color: #4a3f35;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 12px 20px;
+    transition: 0.3s;
+    text-align: center;
+    text-decoration: none;
+}
+
+    .btn-tour-tan:hover {
+        background-color: #c5a372;
+        color: #000;
+    }
+
+.status-badge {
+    color: #e63946;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.tour-title {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+    min-height: 2.6em;
+}
+
+.tour-info-text {
+    font-size: 0.85rem;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.tour-desc-short {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 10px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.ls-1 {
+    letter-spacing: 1px;
+}
+
+.ls-2 {
+    letter-spacing: 2px;
+}
+
+.fw-black {
+    font-weight: 900;
+}
+
+.section-padding {
+    padding: 100px 0;
+}

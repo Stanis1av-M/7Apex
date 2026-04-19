@@ -1,0 +1,85 @@
+﻿@{
+    ViewData["Title"] = "О нас";
+}
+
+<!-- 1. Hero-секция страницы "О нас" -->
+<section class="tour-hero" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920');">
+    <div class="container text-center">
+        <h6 class="text-uppercase mb-2 fw-bold ls-2 small text-muted">Наша история</h6>
+        <h1 class="display-3 fw-black text-uppercase">7apex — это дух гор</h1>
+    </div>
+</section>
+
+<!-- 2. Основной манифест -->
+<div class="container py-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <h2 class="fw-black text-uppercase ls-1 mb-4">Больше, чем просто походы</h2>
+            <p class="lead text-muted mb-5" style="line-height: 1.8;">
+                Мы основали 7apex в 2015 году как сообщество профессиональных альпинистов и любителей дикой природы.
+                Наша цель — сделать самые отдаленные уголки планеты доступными для тех, кто готов бросить себе вызов.
+                Мы не просто продаем туры — мы создаем экспедиции, которые меняют жизнь.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- 3. Три столпа (Ценности) -->
+<section class="py-5 bg-light">
+    <div class="container py-5">
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="p-4 bg-white shadow-sm h-100 border-0">
+                    <h1 class="fw-black text-dark opacity-25 mb-3">01</h1>
+                    <h5 class="fw-bold text-uppercase ls-1">Безопасность</h5>
+                    <p class="small text-muted mt-3">Используем только сертифицированное снаряжение North Face и Petzl. Наши гиды имеют международную квалификацию и опыт более 10 лет.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 bg-white shadow-sm h-100 border-0">
+                    <h1 class="fw-black text-dark opacity-25 mb-3">02</h1>
+                    <h5 class="fw-bold text-uppercase ls-1">Команда</h5>
+                    <p class="small text-muted mt-3">В 7apex нет «клиентов» и «персонала». В горах мы — одна связка. Мы формируем малые группы для максимального комфорта и внимания каждому.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 bg-white shadow-sm h-100 border-0">
+                    <h1 class="fw-black text-dark opacity-25 mb-3">03</h1>
+                    <h5 class="fw-bold text-uppercase ls-1">Снаряжение</h5>
+                    <p class="small text-muted mt-3">Мы тестируем каждую палатку и рюкзак в реальных условиях восьмитысячников, прежде чем предложить их вам в нашем магазине.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. Цифры -->
+<div class="container py-5 my-5">
+    <div class="row text-center g-4">
+        <div class="col-6 col-md-3">
+            <h2 class="fw-black mb-0">10+</h2>
+            <small class="text-uppercase text-muted fw-bold ls-1">Лет опыта</small>
+        </div>
+        <div class="col-6 col-md-3">
+            <h2 class="fw-black mb-0">500+</h2>
+            <small class="text-uppercase text-muted fw-bold ls-1">Экспедиций</small>
+        </div>
+        <div class="col-6 col-md-3">
+            <h2 class="fw-black mb-0">12</h2>
+            <small class="text-uppercase text-muted fw-bold ls-1">Стран мира</small>
+        </div>
+        <div class="col-6 col-md-3">
+            <h2 class="fw-black mb-0">0</h2>
+            <small class="text-uppercase text-muted fw-bold ls-1">Инцидентов</small>
+        </div>
+    </div>
+</div>
+
+<!-- 5. Финальный призыв -->
+<section class="py-5 bg-black text-white text-center">
+    <div class="container py-4">
+        <h3 class="fw-black text-uppercase ls-2 mb-4">Готовы открыть новую вершину?</h3>
+        <p class="text-muted mb-4">Присоединяйтесь к нашей следующей экспедиции.</p>
+        <a asp-controller="Tours" asp-action="Index" class="btn btn-outline-light px-5 py-3 text-uppercase fw-bold ls-1 small" style="border-radius:0;">Выбрать маршрут</a>
+    </div>
+</section>

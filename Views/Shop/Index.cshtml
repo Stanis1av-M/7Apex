@@ -1,0 +1,134 @@
+﻿@model IEnumerable<Apex7.Data.Entities.Product>
+
+<!-- 1. Шапка страницы -->
+<section class="tour-hero">
+    <div class="container text-center">
+        <h6 class="text-uppercase mb-2 fw-bold ls-2 small text-muted">Экипировка</h6>
+        <h1 class="display-5 fw-black text-uppercase">Магазин снаряжения</h1>
+    </div>
+</section>
+
+<div class="container mt-5 mb-5">
+
+    <!-- 2. ПРЕМИАЛЬНАЯ ПАНЕЛЬ ПОИСКА -->
+    <div class="search-panel mb-5">
+        <form asp-action="Index" method="get" class="row g-3 align-items-center">
+            <div class="col-lg-6">
+                <div class="search-input-wrapper">
+                    <i class="bi bi-search search-icon-inner"></i>
+                    <input type="text" name="searchString" value="@ViewBag.CurrentSearch"
+                           class="search-field-custom"
+                           placeholder="Что вы ищете (название или артикул)?">
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="search-select-wrapper">
+                    <select name="categoryId" class="search-select-custom text-uppercase fw-bold">
+                        <option value="">ВСЕ КАТЕГОРИИ</option>
+                        @foreach (var cat in ViewBag.Categories)
+                        {
+                            <option value="@cat.CategoryId">@cat.Name.ToUpper()</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-lg-2">
+                <button type="submit" class="btn-search-main">Найти</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 3. Сетка товаров -->
+    <div class="row g-5">
+        @foreach (var item in Model)
+        {
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="tour-card h-100 position-relative">
+                    <!-- position-relative для позиционирования сердечка -->
+                    <!-- ============================================== -->
+                    <!-- ФОТО ТОВАРА С БЕЙДЖАМИ И КНОПКОЙ ИЗБРАННОГО -->
+                    <!-- ============================================== -->
+                    <div class="tour-card-img-wrap shop-img mb-3">
+                        <img src="@(item.ImageUrl ?? "/images/products/default.jpg")"
+                             class="tour-card-img" alt="@item.Name">
+
+                        <!-- Бейдж скидки -->
+                        @if (item.Discount > 0)
+                        {
+                            <div class="discount-badge">-@item.Discount%</div>
+                        }
+
+                        <!-- Кнопка "В Избранное" -->
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <!-- Форма добавления/удаления (Toggle) -->
+                            <form asp-controller="Favorites" asp-action="Toggle" method="post" class="favorite-form position-absolute top-0 end-0 m-3" style="z-index: 10;">
+                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                <button type="submit" class="btn-favorite @(item.Discount > 0 ? "with-discount" : "")" title="В избранное">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <!-- Гость: перенаправление на логин -->
+                            <a asp-controller="Account" asp-action="Login"
+                               asp-route-message="auth_required"
+                               asp-route-returnUrl="@Context.Request.Path"
+                               class="btn-favorite position-absolute top-0 end-0 m-3 @(item.Discount > 0 ? "with-discount" : "")" title="В избранное" style="z-index: 10;">
+                                <i class="bi bi-heart"></i>
+                            </a>
+                        }
+                    </div>
+
+                    <!-- Контент -->
+                    <div class="px-1 d-flex flex-column flex-grow-1">
+                        <span class="status-badge" style="@(item.Stock > 0 ? "" : "color: #999;")">
+                            @(item.Stock > 0 ? "В НАЛИЧИИ" : "ПОД ЗАКАЗ")
+                        </span>
+
+                        <h4 class="tour-title" style="font-size: 1.1rem;">@item.Name</h4>
+
+                        <div class="tour-info-text text-muted small text-uppercase fw-bold ls-1">
+                            @(item.Manufacturer?.Name ?? "7apex Brand")
+                        </div>
+                        <div class="tour-info-text mb-3">Арт: @item.Article</div>
+
+                        <div class="mt-auto">
+                            <div class="mb-3">
+                                @if (item.OldPrice.HasValue)
+                                {
+                                    <span class="old-price-small">@item.OldPrice.Value.ToString("N0")</span>
+                                }
+                                <span class="new-price" style="@(item.Price > 1000 ? "font-size: 1.3rem; letter-spacing: -1px;" : "")">
+                                    @item.Price.ToString("N0") ₽
+                                </span>
+                            </div>
+
+                            @* --- ЛОГИКА КНОПКИ КОРЗИНЫ --- *@
+                            @if (User.Identity != null && User.Identity.IsAuthenticated)
+                            {
+                                <form asp-controller="Cart" asp-action="Add" method="post">
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <button type="submit" class="btn-tour-tan w-100 border-0">В корзину</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <a asp-controller="Account" asp-action="Login"
+                                   asp-route-message="auth_required"
+                                   asp-route-returnUrl="@Context.Request.Path"
+                                   class="btn-tour-tan w-100 border-0 text-decoration-none d-inline-block text-center">
+                                    В корзину
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

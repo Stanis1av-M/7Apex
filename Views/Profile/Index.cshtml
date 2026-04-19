@@ -1,0 +1,61 @@
+﻿@model Apex7.Data.Entities.User
+
+@{
+    ViewData["Title"] = "Мой профиль";
+}
+
+<div class="container py-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+
+            <div class="text-center mb-5">
+                <h6 class="text-muted text-uppercase ls-2 small mb-2">Личный кабинет</h6>
+                <h1 class="fw-black text-uppercase ls-1">Профиль пользователя</h1>
+            </div>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-dark border-0 rounded-0 small fw-bold text-uppercase ls-1 py-3 mb-4 shadow-sm text-center">
+                    <i class="bi bi-check-circle me-2"></i> @TempData["Success"]
+                </div>
+            }
+
+            <div class="bg-white p-5 border shadow-sm">
+                <form asp-action="Edit" method="post">
+                    <!-- Поля, которые нельзя менять (Email и Роль) -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="small text-uppercase fw-bold ls-1 text-muted mb-1">Email</label>
+                            <div class="form-control-plaintext fw-bold border-bottom">@Model.Email</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small text-uppercase fw-bold ls-1 text-muted mb-1">Ваш статус</label>
+                            <div class="form-control-plaintext fw-bold border-bottom">
+                                <span class="badge bg-dark text-uppercase" style="font-size: 0.6rem;">@Model.Role.Name</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Редактируемые поля -->
+                    <div class="mb-4">
+                        <label class="small text-uppercase fw-bold ls-1 mb-1">Полное имя</label>
+                        <input type="text" name="fullName" value="@Model.FullName" class="form-control rounded-0 border-dark shadow-none py-2" required />
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="small text-uppercase fw-bold ls-1 mb-1">Телефон</label>
+                        <input type="text" name="phone" value="@Model.Phone" class="form-control rounded-0 border-dark shadow-none py-2" placeholder="+7 (___) ___-__-__" />
+                    </div>
+
+                    <button type="submit" class="btn btn-dark w-100 py-3 text-uppercase fw-bold ls-1">
+                        Сохранить изменения
+                    </button>
+                </form>
+
+                <div class="mt-4 pt-4 border-top text-center">
+                    <p class="small text-muted mb-0">Дата регистрации: @Model.RegistrationDate.ToString("dd MMMM yyyy")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

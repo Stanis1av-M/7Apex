@@ -1,0 +1,86 @@
+﻿@model IEnumerable<Apex7.Data.Entities.CartItem>
+
+@{
+    ViewData["Title"] = "Корзина";
+    decimal totalSum = Model.Sum(x => x.Product.Price * x.Quantity);
+}
+
+<section class="tour-hero py-4">
+    <div class="container text-center pt-5">
+        <h1 class="display-5 fw-black text-uppercase">Ваша корзина</h1>
+    </div>
+</section>
+
+<div class="container mt-5 mb-5">
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-cart-x display-1 text-muted"></i>
+            <h3 class="mt-4 fw-bold">В корзине пока пусто</h3>
+            <a asp-controller="Shop" asp-action="Index" class="btn btn-dark mt-3 px-5 py-3 rounded-0">Перейти в магазин</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-5">
+            <!-- Список товаров -->
+            <div class="col-lg-8">
+                <div class="bg-white p-4 shadow-sm border-0">
+                    <table class="table align-middle">
+                        <thead class="text-uppercase small fw-bold text-muted">
+                            <tr>
+                                <th>Товар</th>
+                                <th>Цена</th>
+                                <th>Кол-во</th>
+                                <th>Итого</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="@item.Product.ImageUrl" width="60" class="me-3 rounded">
+                                            <div>
+                                                <div class="fw-bold small text-uppercase">@item.Product.Name</div>
+                                                <small class="text-muted">Арт: @item.Product.Article</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="small fw-bold">@item.Product.Price.ToString("N0") ₽</td>
+                                    <td>@item.Quantity</td>
+                                    <td class="fw-bold">@((item.Product.Price * item.Quantity).ToString("N0")) ₽</td>
+                                    <td class="text-end">
+                                        <form asp-action="Remove" method="post">
+                                            <input type="hidden" name="cartItemId" value="@item.CartItemId" />
+                                            <button type="submit" class="btn btn-link text-danger p-0"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Итоговый блок -->
+            <div class="col-lg-4">
+                <div class="bg-black text-white p-4 shadow-lg">
+                    <h5 class="text-uppercase fw-bold mb-4 ls-1">Детали заказа</h5>
+                    <div class="d-flex justify-content-between mb-3 opacity-75">
+                        <span>Позиций:</span>
+                        <span>@Model.Count()</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-4 border-top pt-3">
+                        <span class="fw-bold">ИТОГО:</span>
+                        <span class="fs-4 fw-black">@totalSum.ToString("N0") ₽</span>
+                    </div>
+                    <button class="btn btn-light w-100 py-3 text-uppercase fw-bold ls-1 rounded-0">Оформить заказ</button>
+                    <a asp-controller="Shop" asp-action="Index" class="d-block text-center text-white text-decoration-none small mt-3 opacity-50">Продолжить покупки</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

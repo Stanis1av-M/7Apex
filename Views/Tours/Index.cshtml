@@ -1,0 +1,44 @@
+﻿@model IEnumerable<Apex7.Data.Entities.Tour>
+
+<section class="tour-hero">
+    <div class="container text-center">
+        <h6 class="text-uppercase mb-2 fw-bold ls-2 small text-muted">Экспедиции 2025</h6>
+        <h1 class="display-5 fw-black text-uppercase">Наши маршруты</h1>
+    </div>
+</section>
+
+<div class="container py-5 mt-n5">
+    <!-- g-5 добавляет те самые красивые отступы между карточками -->
+    <div class="row g-5">
+        @foreach (var tour in Model)
+        {
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="tour-card">
+
+                    <div class="tour-card-img-wrap">
+                        <img src="@(tour.ImageUrl ?? "/images/tours/default.jpg")"
+                             class="tour-card-img" alt="@tour.Name">
+                    </div>
+
+                    <div class="px-1 d-flex flex-column flex-grow-1">
+                        <span class="status-badge">Места есть</span>
+
+                        <h4 class="tour-title">@tour.Name</h4>
+
+                        <div class="tour-info-text fw-bold">Май-Август 2026</div>
+                        <div class="tour-info-text">@tour.DurationDays дней</div>
+
+                        <p class="tour-desc-short">@tour.Description</p>
+
+                        <div class="mt-auto">
+                            <div class="mb-3">
+                                <span class="new-price">от 140 000 руб</span>
+                            </div>
+                            <a href="#" class="btn-tour-tan w-100">Подробнее о программе</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,52 @@
+﻿@model Apex7.Models.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Регистрация";
+}
+
+<div class="container flex-grow-1 d-flex align-items-center justify-content-center py-5">
+    <div class="col-12 col-md-6 col-lg-5">
+        <div class="text-center mb-5">
+            <h6 class="text-muted text-uppercase ls-2 small mb-2">Станьте частью команды</h6>
+            <h1 class="fw-black text-uppercase ls-1">Регистрация</h1>
+        </div>
+
+        <form asp-action="Register" method="post" class="bg-white p-4 border shadow-sm">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="FullName" class="small text-uppercase fw-bold ls-1 mb-1">Полное имя</label>
+                <input asp-for="FullName" class="form-control rounded-0 border-dark shadow-none" placeholder="Иван Иванов" />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="small text-uppercase fw-bold ls-1 mb-1">Email</label>
+                <input asp-for="Email" class="form-control rounded-0 border-dark shadow-none" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Password" class="small text-uppercase fw-bold ls-1 mb-1">Пароль</label>
+                    <input asp-for="Password" type="password" class="form-control rounded-0 border-dark shadow-none" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label asp-for="ConfirmPassword" class="small text-uppercase fw-bold ls-1 mb-1">Повтор</label>
+                    <input asp-for="ConfirmPassword" type="password" class="form-control rounded-0 border-dark shadow-none" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-dark w-100 py-3 text-uppercase fw-bold ls-1 mb-3">
+                Зарегистрироваться
+            </button>
+
+            <div class="text-center mt-3">
+                <p class="small text-muted mb-0">Уже есть аккаунт?</p>
+                <a asp-action="Login" class="text-dark fw-bold small text-uppercase text-decoration-none border-bottom border-dark pb-1">Войти в систему</a>
+            </div>
+        </form>
+    </div>
+</div>

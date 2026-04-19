@@ -1,0 +1,55 @@
+﻿@model IEnumerable<Apex7.Data.Entities.FavoriteProduct>
+@{
+    ViewData["Title"] = "Избранное";
+    // URL для возврата на эту же страницу при удалении
+    var returnUrl = "/Favorites/Index";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold">Ваше избранное</h1>
+        <p class="lead text-muted">Товары, которые вы отметили.</p>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+            @foreach (var favorite in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        @* Убедитесь, что у вашего Product есть свойство ImageUrl или аналогичное *@
+                        <img src="@favorite.Product.ImageUrl" class="card-img-top" alt="@favorite.Product.Name">
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@favorite.Product.Name</h5>
+                            @* Контроллер подгружает Manufacturer, поэтому мы можем его использовать *@
+                            <h6 class="card-subtitle mb-2 text-muted">@favorite.Product.Manufacturer.Name</h6>
+                            <p class="card-text mt-auto">
+                                <span class="fw-bold fs-5">@favorite.Product.Price.ToString("C")</span>
+                            </p>
+                        </div>
+
+                        <div class="card-footer bg-white border-top-0">
+                            <!-- Кнопка для удаления (она тоже просто переключает состояние) -->
+                            <form asp-controller="Favorites" asp-action="Toggle" method="post">
+                                <input type="hidden" name="productId" value="@favorite.ProductId" />
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                                    <i class="bi bi-trash-fill me-1"></i> Убрать из избранного
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center mt-4">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            Ваш список избранного пока пуст. Добавьте товары, нажав на сердечко в каталоге.
+        </div>
+    }
+</div>
