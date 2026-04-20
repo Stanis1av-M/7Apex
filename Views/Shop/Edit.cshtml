@@ -1,68 +1,118 @@
 ﻿@model Apex7.Data.Entities.Product
 
 <div class="container py-5 mt-5">
-    <h2 class="text-uppercase fw-black mb-4">Редактирование: @Model.Name</h2>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Заголовок и кнопка удаления -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-uppercase fw-black mb-0 ls-1" style="font-size: 1.6rem;">
+                    Редактирование: <span class="text-muted fw-normal">@Model.Name</span>
+                </h2>
 
-    <form asp-action="Edit" method="post" enctype="multipart/form-data" class="bg-white p-5 border shadow-sm">
-        <input type="hidden" asp-for="ProductId" />
+                <form asp-action="Delete" method="post" onsubmit="return confirm('Удалить этот товар навсегда?');">
+                    <input type="hidden" name="id" value="@Model.ProductId" />
+                    <button type="submit" class="btn btn-outline-danger btn-sm text-uppercase fw-bold ls-1 rounded-pill px-4">
+                        <i class="bi bi-trash3 me-1"></i> Удалить
+                    </button>
+                </form>
+            </div>
 
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="small fw-bold text-uppercase">Название</label>
-                <input asp-for="Name" class="form-control rounded-0" required />
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="small fw-bold text-uppercase">Артикул</label>
-                <input asp-for="Article" class="form-control rounded-0" />
-            </div>
+            <!-- Основная форма -->
+            <form asp-action="Edit" method="post" enctype="multipart/form-data" class="bg-white p-5 border-0 shadow-lg" style="border-radius: 20px;">
+                <input type="hidden" asp-for="ProductId" />
+
+                <div asp-validation-summary="ModelOnly" class="text-danger small fw-bold mb-4"></div>
+
+                <div class="row g-4 mb-4">
+                    <!-- НАЗВАНИЕ (Лимит 30 символов) -->
+                    <div class="col-md-6">
+                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Название товара (до 30 симв.) <span class="text-danger">*</span></label>
+                        <input asp-for="Name" class="form-control form-control-lg bg-light border-0" maxlength="30" placeholder="Введите название" required />
+                        <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                    </div>
+                    <!-- АРТИКУЛ (Лимит 30 символов) -->
+                    <div class="col-md-6">
+                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Артикул (до 30 симв.)</label>
+                        <input asp-for="Article" class="form-control form-control-lg bg-light border-0" maxlength="30" placeholder="TENT-001" />
+                        <span asp-validation-for="Article" class="text-danger small mt-1 d-block"></span>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <!-- КАТЕГОРИЯ -->
+                    <div class="col-md-6">
+                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Категория (ID)</label>
+                        <input asp-for="CategoryId" type="number" class="form-control form-control-lg bg-light border-0" required />
+                        <span asp-validation-for="CategoryId" class="text-danger small mt-1 d-block"></span>
+                    </div>
+                    <!-- ПРОИЗВОДИТЕЛЬ (ВЫПАДАЮЩИЙ СПИСОК) -->
+                    <div class="col-md-6">
+                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Производитель</label>
+                        <select asp-for="ManufacturerId" class="form-select form-select-lg bg-light border-0 fw-bold"
+                                asp-items="@(new SelectList(ViewBag.Manufacturers, "ManufactureId", "Name"))" style="font-size: 0.9rem;">
+                        </select>
+                        <span asp-validation-for="ManufacturerId" class="text-danger small mt-1 d-block"></span>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <!-- ЦЕНА (Лимит 5 цифр) -->
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Цена (₽)</label>
+                        <input asp-for="Price" type="number" step="0.01" class="form-control form-control-lg bg-light border-0 fw-bold"
+                               oninput="if(this.value.length > 5) this.value = this.value.slice(0, 5);" required />
+                        <span asp-validation-for="Price" class="text-danger small mt-1 d-block"></span>
+                    </div>
+                    <!-- СТАРАЯ ЦЕНА (Лимит 5 цифр) -->
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Старая цена</label>
+                        <input asp-for="OldPrice" type="number" step="0.01" class="form-control form-control-lg bg-light border-0 text-muted"
+                               oninput="if(this.value.length > 5) this.value = this.value.slice(0, 5);" />
+                    </div>
+                    <!-- СКИДКА (Лимит 3 цифры - до 100%) -->
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Скидка (%)</label>
+                        <input asp-for="Discount" type="number" class="form-control form-control-lg bg-light border-0"
+                               oninput="if(this.value.length > 3) this.value = this.value.slice(0, 3);" />
+                    </div>
+                    <!-- ОСТАТОК (Лимит 5 цифр) -->
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-danger">Остаток шт. <span class="text-danger">*</span></label>
+                        <input asp-for="Stock" type="number" class="form-control form-control-lg border-danger text-danger fw-bold"
+                               style="background-color: #fff5f5;" oninput="if(this.value.length > 5) this.value = this.value.slice(0, 5);" required />
+                        <span asp-validation-for="Stock" class="text-danger small mt-1 d-block"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Описание</label>
+                    <textarea asp-for="Description" class="form-control bg-light border-0 p-3" rows="3" placeholder="Краткое описание товара..."></textarea>
+                </div>
+
+                <div class="mb-5 p-4 rounded" style="background-color: #f8f9fa; border: 1px dashed #dee2e6;">
+                    <label class="small fw-bold text-uppercase ls-1 mb-2 text-dark"><i class="bi bi-image me-2"></i>Сменить фото</label>
+                    <input type="file" name="imageFile" class="form-control bg-white border-0" accept="image/*" />
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between pt-4 border-top">
+                    <div class="form-check form-switch fs-5">
+                        <input asp-for="IsVisible" class="form-check-input" type="checkbox" id="visibleCheck" role="switch">
+                        <label class="form-check-label fs-6 fw-bold text-uppercase ls-1 ms-2" for="visibleCheck" style="cursor: pointer;">
+                            В продаже
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-dark btn-lg px-5 text-uppercase fw-bold ls-1 rounded-pill shadow">
+                        Сохранить изменения
+                    </button>
+                </div>
+            </form>
         </div>
-
-        <!-- ИСПРАВЛЕННЫЙ БЛОК: Выбор категории и производителя -->
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="small fw-bold text-uppercase">Категория</label>
-                <select asp-for="CategoryId" class="form-control rounded-0"
-                        asp-items="@(new SelectList(ViewBag.Categories, "CategoryId", "Name"))">
-                </select>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="small fw-bold text-uppercase">Производитель</label>
-                <select asp-for="ManufacturerId" class="form-control rounded-0"
-                        asp-items="@(new SelectList(ViewBag.Manufacturers, "ManufactureId", "Name"))">
-                </select>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label class="small fw-bold text-uppercase">Цена</label>
-                <input asp-for="Price" class="form-control rounded-0" />
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="small fw-bold text-uppercase">Старая цена</label>
-                <input asp-for="OldPrice" class="form-control rounded-0" />
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="small fw-bold text-uppercase">Скидка (%)</label>
-                <input asp-for="Discount" class="form-control rounded-0" />
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <label class="small fw-bold text-uppercase">Описание</label>
-            <textarea asp-for="Description" class="form-control rounded-0" rows="3"></textarea>
-        </div>
-
-        <div class="mb-4">
-            <label class="small fw-bold text-uppercase">Новое фото</label>
-            <input type="file" name="imageFile" class="form-control rounded-0" accept="image/*" />
-        </div>
-
-        <div class="form-check mb-4">
-            <input asp-for="IsVisible" class="form-check-input" type="checkbox" id="visibleCheck">
-            <label class="form-check-label small fw-bold" for="visibleCheck">Товар виден на сайте</label>
-        </div>
-
-        <button type="submit" class="btn btn-dark w-100 py-3 text-uppercase fw-bold ls-1">Сохранить изменения</button>
-    </form>
+    </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

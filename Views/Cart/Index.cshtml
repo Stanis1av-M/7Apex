@@ -2,37 +2,43 @@
 
 @{
     ViewData["Title"] = "Корзина";
-    decimal totalSum = Model.Sum(x => x.Product.Price * x.Quantity);
+    // Считаем общую сумму всех товаров в корзине
+    decimal totalSum = Model?.Sum(x => x.Product.Price * x.Quantity) ?? 0;
 }
 
-<section class="tour-hero py-4">
-    <div class="container text-center pt-5">
-        <h1 class="display-5 fw-black text-uppercase">Ваша корзина</h1>
+<div class="container py-5 mt-5">
+    <div class="text-center mb-5">
+        <h6 class="text-muted text-uppercase ls-2 small mb-2">Покупки</h6>
+        <h1 class="fw-black text-uppercase ls-1">Ваша корзина</h1>
     </div>
-</section>
 
-<div class="container mt-5 mb-5">
-    @if (!Model.Any())
+    @if (Model == null || !Model.Any())
     {
+        <!-- Если корзина пуста -->
         <div class="text-center py-5">
-            <i class="bi bi-cart-x display-1 text-muted"></i>
-            <h3 class="mt-4 fw-bold">В корзине пока пусто</h3>
-            <a asp-controller="Shop" asp-action="Index" class="btn btn-dark mt-3 px-5 py-3 rounded-0">Перейти в магазин</a>
+            <i class="bi bi-cart-x display-1 text-muted opacity-50 mb-4 d-block"></i>
+            <h4 class="fw-bold text-uppercase">Корзина пуста</h4>
+            <p class="text-muted mb-4">Самое время подобрать лучшее снаряжение для вашего следующего похода.</p>
+            <a asp-controller="Shop" asp-action="Index" class="btn btn-dark px-5 py-3 text-uppercase fw-bold ls-1">
+                Перейти в магазин
+            </a>
         </div>
     }
     else
     {
+        <!-- Если в корзине есть товары -->
         <div class="row g-5">
-            <!-- Список товаров -->
+
+            <!-- Левая колонка: Список товаров -->
             <div class="col-lg-8">
                 <div class="bg-white p-4 shadow-sm border-0">
-                    <table class="table align-middle">
+                    <table class="table align-middle mb-0">
                         <thead class="text-uppercase small fw-bold text-muted">
                             <tr>
-                                <th>Товар</th>
+                                <th style="width: 50%;">Снаряжение</th>
                                 <th>Цена</th>
                                 <th>Кол-во</th>
-                                <th>Итого</th>
+                                <th>Сумма</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -40,22 +46,36 @@
                             @foreach (var item in Model)
                             {
                                 <tr>
+                                    <!-- Товар (Фото + Название) -->
                                     <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="@item.Product.ImageUrl" width="60" class="me-3 rounded">
+                                        <div class="d-flex align-items-center py-3">
+                                            <div class="bg-light p-2 rounded me-3" style="width: 80px; height: 80px;">
+                                                <img src="@(item.Product.ImageUrl ?? "/images/products/default.jpg")"
+                                                     class="w-100 h-100" style="object-fit: contain;">
+                                            </div>
                                             <div>
-                                                <div class="fw-bold small text-uppercase">@item.Product.Name</div>
+                                                <div class="fw-bold text-uppercase small" style="line-height: 1.3;">@item.Product.Name</div>
                                                 <small class="text-muted">Арт: @item.Product.Article</small>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="small fw-bold">@item.Product.Price.ToString("N0") ₽</td>
-                                    <td>@item.Quantity</td>
-                                    <td class="fw-bold">@((item.Product.Price * item.Quantity).ToString("N0")) ₽</td>
+
+                                    <!-- Цена -->
+                                    <td class="fw-bold small">@item.Product.Price.ToString("N0") ₽</td>
+
+                                    <!-- Количество (Пока статично, в будущем можно добавить + и -) -->
+                                    <td class="fw-bold">@item.Quantity шт.</td>
+
+                                    <!-- Итого за позицию -->
+                                    <td class="fw-black text-danger">@((item.Product.Price * item.Quantity).ToString("N0")) ₽</td>
+
+                                    <!-- Кнопка удаления из корзины -->
                                     <td class="text-end">
                                         <form asp-action="Remove" method="post">
                                             <input type="hidden" name="cartItemId" value="@item.CartItemId" />
-                                            <button type="submit" class="btn btn-link text-danger p-0"><i class="bi bi-trash"></i></button>
+                                            <button type="submit" class="btn btn-link text-muted p-0 hover-danger" title="Удалить">
+                                                <i class="bi bi-x-lg fs-5"></i>
+                                            </button>
                                         </form>
                                     </td>
                                 </tr>
@@ -65,26 +85,45 @@
                 </div>
             </div>
 
-            <!-- Итоговый блок -->
+            <!-- Правая колонка: Итог и Оформление заказа -->
             <div class="col-lg-4">
-                <div class="bg-black text-white p-4 shadow-lg">
-                    <h5 class="text-uppercase fw-bold mb-4 ls-1">Детали заказа</h5>
-                    <div class="d-flex justify-content-between mb-3 opacity-75">
-                        <span>Позиций:</span>
-                        <span>@Model.Count()</span>
+                <div class="bg-black text-white p-5 shadow-lg position-sticky" style="top: 100px;">
+                    <h5 class="text-uppercase fw-bold mb-4 ls-1">Сводка заказа</h5>
+
+                    <div class="d-flex justify-content-between mb-3 opacity-75 small">
+                        <span>Товаров в корзине:</span>
+                        <span class="fw-bold">@Model.Sum(x => x.Quantity) шт.</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-4 border-top pt-3">
-                        <span class="fw-bold">ИТОГО:</span>
-                        <span class="fs-4 fw-black">@totalSum.ToString("N0") ₽</span>
+
+                    <div class="d-flex justify-content-between mb-4 pb-4 border-bottom border-secondary">
+                        <span class="text-uppercase ls-1 small mt-1">Доставка:</span>
+                        <span class="fw-bold small text-end">Рассчитывается<br>менеджером</span>
                     </div>
-                    <form asp-controller="Cart" asp-action="Checkout" method="post">
-                        <button type="submit" class="btn btn-light w-100 py-3 text-uppercase fw-bold ls-1 rounded-0">
+
+                    <div class="d-flex justify-content-between mb-5 align-items-end">
+                        <span class="fw-bold text-uppercase ls-1">Итого:</span>
+                        <span class="fs-3 fw-black text-warning">@totalSum.ToString("N0") ₽</span>
+                    </div>
+
+                    <!-- Форма оформления заказа -->
+                    <form asp-action="Checkout" method="post">
+                        <button type="submit" class="btn btn-light w-100 py-3 text-uppercase fw-bold ls-1 mb-3">
                             Оформить заказ
                         </button>
                     </form>
-                    <a asp-controller="Shop" asp-action="Index" class="d-block text-center text-white text-decoration-none small mt-3 opacity-50">Продолжить покупки</a>
+
+                    <a asp-controller="Shop" asp-action="Index" class="d-block text-center text-white text-decoration-none small opacity-50 hover-opacity-100 transition-300">
+                        ← Вернуться к покупкам
+                    </a>
                 </div>
             </div>
+
         </div>
     }
 </div>
+
+<style>
+    .hover-danger:hover { color: #dc3545 !important; }
+    .transition-300 { transition: 0.3s; }
+    .hover-opacity-100:hover { opacity: 1 !important; }
+</style>

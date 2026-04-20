@@ -86,7 +86,7 @@ footer {
     opacity: 0.6;
 }
 
-/* --- 5. ОБЩИЕ СТИЛИ ШАПКИ СТРАНИЦ (ТУРЫ И МАГАЗИН) --- */
+/* --- 5. ОБЩИЕ СТИЛИ ШАПКИ СТРАНИЦ --- */
 .tour-hero {
     position: relative;
     z-index: 1;
@@ -104,7 +104,7 @@ footer {
     margin-top: 40px !important;
 }
 
-/* --- 6. ПАНЕЛЬ ПОИСКА (МАГАЗИН) --- */
+/* --- 6. ПАНЕЛЬ ПОИСКА --- */
 .search-panel {
     background: #ffffff;
     border-radius: 20px;
@@ -176,19 +176,14 @@ footer {
     transition: 0.3s;
 }
 
-    .btn-search-main:hover {
-        background-color: #000;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
-
-/* --- 7. КАРТОЧКИ ТОВАРОВ И ТУРОВ --- */
+/* --- 7. КАРТОЧКИ --- */
 .tour-card {
     border: none !important;
     background: #fff;
     display: flex;
     flex-direction: column;
     height: 100%;
+    position: relative;
 }
 
 .tour-card-img-wrap {
@@ -219,7 +214,7 @@ footer {
     transform: scale(1.08);
 }
 
-/* --- 8. ИЗБРАННОЕ И СКИДКИ (НОВЫЙ БЛОК) --- */
+/* --- 8. ИЗБРАННОЕ И БЕЙДЖИ --- */
 .discount-badge {
     position: absolute;
     top: 15px;
@@ -233,10 +228,17 @@ footer {
     border-radius: 5px;
 }
 
-/* Анимация кнопки-сердечка */
-.favorite-form {
-    margin: 0;
-    padding: 0;
+.hidden-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: #6c757d;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 800;
+    padding: 4px 8px;
+    z-index: 10;
+    text-transform: uppercase;
 }
 
 .btn-favorite {
@@ -250,23 +252,19 @@ footer {
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    transition: 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-    text-decoration: none;
-    opacity: 0; /* Скрываем по умолчанию */
+    transition: 0.3s;
+    opacity: 0;
 }
 
-/* Показываем сердечко только при наведении на карточку */
 .tour-card:hover .btn-favorite {
     opacity: 1;
 }
 
 .btn-favorite:hover {
-    background-color: #e63946; /* Красный фирменный цвет */
+    background-color: #e63946;
     color: #fff;
-    transform: scale(1.15);
 }
 
-/* Если есть скидка, двигаем сердечко влево */
 .btn-favorite.with-discount {
     right: 55px !important;
 }
@@ -302,6 +300,26 @@ footer {
         color: #000;
     }
 
+/* --- 10. ЛОГИКА "НЕТ В НАЛИЧИИ" И "СКРЫТО" --- */
+.out-of-stock {
+    filter: grayscale(1) opacity(0.6);
+}
+
+    /* Блокируем всё, кроме админской кнопки */
+    .out-of-stock * {
+        pointer-events: none;
+    }
+
+/* Кнопка "Редактировать" — ИСКЛЮЧЕНИЕ */
+.admin-edit-btn {
+    pointer-events: auto !important; /* РАЗРЕШАЕМ КЛИК */
+    filter: none !important; /* Убираем серость */
+    opacity: 1 !important;
+    position: relative;
+    z-index: 150;
+}
+
+/* --- 11. ВСПОМОГАТЕЛЬНЫЕ КЛАССЫ --- */
 .status-badge {
     color: #e63946;
     font-size: 0.7rem;
@@ -311,6 +329,10 @@ footer {
     display: block;
 }
 
+    .status-badge.disabled {
+        color: #999 !important;
+    }
+
 .tour-title {
     font-weight: 700;
     font-size: 1.15rem;
@@ -319,42 +341,6 @@ footer {
     min-height: 2.6em;
 }
 
-.tour-info-text {
-    font-size: 0.85rem;
-    color: #333;
-    margin-bottom: 4px;
-}
-
-.tour-desc-short {
-    font-size: 0.85rem;
-    color: #666;
-    margin-top: 10px;
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin-bottom: 20px;
-}
-/* --- 10. СТИЛИ ДЛЯ ТОВАРОВ НЕТ В НАЛИЧИИ --- */
-
-.out-of-stock {
-    filter: grayscale(1) opacity(0.7); /* Товар становится серо-тусклым */
-    pointer-events: none; /* Блокирует любые клики по этой карточке */
-    cursor: not-allowed;
-}
-
-    /* Скрываем кнопки у недоступных товаров */
-    .out-of-stock .btn-tour-tan,
-    .out-of-stock .btn-favorite,
-    .out-of-stock .discount-badge {
-        display: none !important;
-    }
-
-/* Немного подправим статус, если товар не в наличии */
-.status-badge.disabled {
-    color: #999 !important;
-}
 .ls-1 {
     letter-spacing: 1px;
 }
@@ -367,6 +353,14 @@ footer {
     font-weight: 900;
 }
 
-.section-padding {
-    padding: 100px 0;
+/* Убираем стрелочки у полей number */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
 }

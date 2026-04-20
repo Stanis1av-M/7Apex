@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<Apex7.Data.Entities.Product>
 
-<!-- 1. Шапка страницы -->
+<!-- 1. Шапка (оставляем без изменений) -->
 <section class="tour-hero">
     <div class="container text-center">
         <h6 class="text-uppercase mb-2 fw-bold ls-2 small text-muted">Экипировка</h6>
@@ -9,134 +9,116 @@
 </section>
 
 <div class="container mt-5 mb-5">
-
-    <!-- 2. ПРЕМИАЛЬНАЯ ПАНЕЛЬ ПОИСКА -->
+    <!-- 2. Панель поиска (оставляем без изменений) -->
     <div class="search-panel mb-5">
         <form asp-action="Index" method="get" class="row g-3 align-items-center">
             <div class="col-lg-6">
                 <div class="search-input-wrapper">
                     <i class="bi bi-search search-icon-inner"></i>
-                    <input type="text" name="searchString" value="@ViewBag.CurrentSearch"
-                           class="search-field-custom"
-                           placeholder="Что вы ищете (название или артикул)?">
+                    <input type="text" name="searchString" value="@ViewBag.CurrentSearch" class="search-field-custom" placeholder="Что вы ищете?">
                 </div>
             </div>
-
             <div class="col-lg-4">
-                <div class="search-select-wrapper">
-                    <select name="categoryId" class="search-select-custom text-uppercase fw-bold">
-                        <option value="">ВСЕ КАТЕГОРИИ</option>
-                        @foreach (var cat in ViewBag.Categories)
-                        {
-                            <option value="@cat.CategoryId">@cat.Name.ToUpper()</option>
-                        }
-                    </select>
-                </div>
+                <select name="categoryId" class="search-select-custom text-uppercase fw-bold" asp-items="@(new SelectList(ViewBag.Categories, "CategoryId", "Name", ViewBag.SelectedCategory))">
+                    <option value="">ВСЕ КАТЕГОРИИ</option>
+                </select>
             </div>
-
             <div class="col-lg-2">
                 <button type="submit" class="btn-search-main">Найти</button>
             </div>
         </form>
     </div>
-<!-- 3. Сетка товаров -->
-    <div class="row g-5"> <!-- Добавили row -->
+
+    <!-- 3. Сетка товаров -->
+    <div class="row g-5">
         @foreach (var item in Model)
         {
-            // ОПРЕДЕЛЯЕМ ДОСТУПНОСТЬ
-            bool isAvailable = item.Stock > 0 && item.IsVisible;
-            string stockClass = isAvailable ? "" : "out-of-stock";
+            // ЛОГИКА ДЛЯ МЕНЕДЖЕРА
+            bool isOutOfStock = item.Stock <= 0;
+            bool isHidden = !item.IsVisible;
+            bool isGray = isOutOfStock || isHidden; // Карточка будет серой в обоих случаях
+
+            string stockClass = isGray ? "out-of-stock" : "";
 
             <div class="col-12 col-md-6 col-lg-3">
-                <!-- ДОБАВЛЯЕМ @stockClass -->
                 <div class="tour-card h-100 @stockClass">
 
-                    <!-- Фото товара -->
-                    <div class="tour-card-img-wrap shop-img mb-3">
-                        <img src="@(item.ImageUrl ?? "/images/products/default.jpg")"
-                             class="tour-card-img" alt="@item.Name">
+                    <!-- ФОТО ТОВАРА -->
+                    <div class="tour-card-img-wrap shop-img mb-3 position-relative">
+                        <img src="@(item.ImageUrl ?? "/images/products/default.jpg")" class="tour-card-img" alt="@item.Name">
 
-                        @if (item.Discount > 0 && isAvailable)
+                        @if (isHidden)
+                        {
+                            <div class="position-absolute top-0 start-0 bg-secondary text-white px-2 py-1 m-2 small fw-bold" style="z-index: 5; font-size: 0.6rem;">
+                                СКРЫТ С САЙТА
+                            </div>
+                        }
+
+                        @if (item.Discount > 0 && !isHidden && !isOutOfStock)
                         {
                             <div class="discount-badge">-@item.Discount%</div>
                         }
 
-                        @* --- КНОПКА ИЗБРАННОГО --- *@
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        @* Кнопка избранного (только если товар не скрыт) *@
+                        @if (!isHidden)
                         {
                             <form asp-controller="Favorites" asp-action="Toggle" method="post" class="position-absolute top-0 end-0 m-3" style="z-index: 10;">
                                 <input type="hidden" name="productId" value="@item.ProductId" />
                                 <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                <button type="submit" class="btn-favorite @(item.Discount > 0 ? "with-discount" : "")" title="В избранное">
-                                    <i class="bi bi-heart"></i>
-                                </button>
+                                <button type="submit" class="btn-favorite @(item.Discount > 0 ? "with-discount" : "")"><i class="bi bi-heart"></i></button>
                             </form>
                         }
-                        else
-                        {
-                            <a asp-controller="Account" asp-action="Login"
-                               asp-route-message="auth_required"
-                               asp-route-returnUrl="@Context.Request.Path"
-                               class="btn-favorite position-absolute top-0 end-0 m-3 @(item.Discount > 0 ? "with-discount" : "")"
-                               title="Войдите, чтобы добавить в избранное" style="z-index: 10;">
-                                <i class="bi bi-heart"></i>
-                            </a>
-                        }
-                    </div> <!-- ЭТОТ ТЕГ ЗАКРЫВАЛ ИМЕННО tour-card-img-wrap -->
+                    </div>
 
-                    <!-- Контент -->
-                    <div class="px-3 d-flex flex-column flex-grow-1">
-                        <span class="status-badge" style="@(item.Stock > 0 ? "" : "color: #999;")">
-                            @(item.Stock > 0 ? "В НАЛИЧИИ" : "ПОД ЗАКАЗ")
+                    <!-- КОНТЕНТ КАРТОЧКИ -->
+                    <div class="px-1 d-flex flex-column flex-grow-1">
+                        <span class="status-badge @(isGray ? "disabled" : "")">
+                            @if (isHidden)
+                            {
+                                <text>СНЯТ С ПРОДАЖИ</text>
+                            }
+                            else if (isOutOfStock)
+                            {
+
+                                <text>НЕТ В НАЛИЧИИ</text>
+                            }
+                            else
+                            {
+
+                                <text>В НАЛИЧИИ</text>
+                            }
                         </span>
 
                         <h4 class="tour-title" style="font-size: 1.1rem;">@item.Name</h4>
-
-                        <div class="tour-info-text text-muted small text-uppercase fw-bold ls-1">
-                            @(item.Manufacturer?.Name ?? "7apex Brand")
-                        </div>
+                        <div class="tour-info-text text-muted small text-uppercase fw-bold ls-1">@item.Manufacturer?.Name</div>
                         <div class="tour-info-text mb-3">Арт: @item.Article</div>
 
                         <div class="mt-auto">
                             <div class="mb-3">
-                                @if (item.OldPrice.HasValue)
-                                {
-                                    <span class="old-price-small">@item.OldPrice.Value.ToString("N0")</span>
-                                }
-                                <span class="new-price" style="@(item.Price > 1000 ? "font-size: 1.3rem; letter-spacing: -1px;" : "")">
-                                    @item.Price.ToString("N0") ₽
-                                </span>
+                                <span class="new-price">@item.Price.ToString("N0") ₽</span>
                             </div>
 
-                            @if (User.Identity != null && User.Identity.IsAuthenticated)
+                            @* Кнопка корзины только если товар реально доступен *@
+                            @if (!isGray)
                             {
                                 <form asp-controller="Cart" asp-action="Add" method="post" class="mb-2">
                                     <input type="hidden" name="productId" value="@item.ProductId" />
-                                    <button type="submit" class="btn-tour-tan w-100 border-0">В корзину</button>
+                                    <button type="submit" class="btn btn-tour-tan w-100 border-0">В корзину</button>
                                 </form>
                             }
-                            else
-                            {
-                                <a asp-controller="Account" asp-action="Login"
-                                   asp-route-message="auth_required"
-                                   asp-route-returnUrl="@Context.Request.Path"
-                                   class="btn-tour-tan w-100 border-0 text-decoration-none d-inline-block text-center mb-2">
-                                    В корзину
-                                </a>
-                            }
 
+                            @* Кнопка редактирования (Всегда активна для Менеджера) *@
                             @if (User.IsInRole("Администратор") || User.IsInRole("Менеджер"))
                             {
                                 <a asp-action="Edit" asp-route-id="@item.ProductId"
-                                   class="btn btn-outline-dark btn-sm w-100 text-uppercase small fw-bold mt-1"
-                                   style="font-size: 0.65rem; border-radius: 4px;">
+                                   class="btn btn-outline-dark btn-sm w-100 text-uppercase small fw-bold mt-1 admin-edit-btn">
                                     Редактировать
                                 </a>
                             }
                         </div>
                     </div>
-                </div> <!-- Закрыли tour-card -->
-            </div> <!-- Закрыли col-12 -->
+                </div>
+            </div>
         }
-    </div> 
+    </div>
 </div>

@@ -10,14 +10,13 @@ using System.Threading.Tasks;
 
 namespace Apex7.Controllers
 {
-    [Authorize] // Только авторизованные
+    [Authorize]
     public class CartController : Controller
     {
         private readonly ApplicationDbContext _context;
 
         public CartController(ApplicationDbContext context) => _context = context;
 
-        // Показать корзину
         public async Task<IActionResult> Index()
         {
             var userEmail = User.Identity!.Name;
@@ -29,7 +28,6 @@ namespace Apex7.Controllers
             return View(user?.CartItems.ToList() ?? new List<CartItem>());
         }
 
-        // Добавить товар
         [HttpPost]
         public async Task<IActionResult> Add(int productId)
         {
@@ -61,7 +59,6 @@ namespace Apex7.Controllers
             return RedirectToAction("Index");
         }
 
-        // Удалить товар
         [HttpPost]
         public async Task<IActionResult> Remove(int cartItemId)
         {
@@ -74,8 +71,8 @@ namespace Apex7.Controllers
             return RedirectToAction("Index");
         }
 
-        // --- МЕТОД ОФОРМЛЕНИЯ ЗАКАЗА ---
-        
+        // --- ОБНОВЛЕННЫЙ МЕТОД ОФОРМЛЕНИЯ ЗАКАЗА СО СПИСАНИЕМ ---
+
         [HttpPost]
         public async Task<IActionResult> Checkout()
         {
@@ -87,50 +84,80 @@ namespace Apex7.Controllers
 
             if (user == null || !user.CartItems.Any()) return RedirectToAction("Index");
 
-            // 1. НАХОДИМ ID В БАЗЕ (Чтобы не хардкодить 1, 2, 3...)
+            // Находим справочные данные
             var status = await _context.OrderStatuses.FirstOrDefaultAsync();
             var delivery = await _context.DeliveryMethods.FirstOrDefaultAsync();
             var payment = await _context.PaymentMethods.FirstOrDefaultAsync();
 
-            // Если в таблицах вообще пусто, вернем ошибку
             if (status == null || delivery == null || payment == null)
             {
-                TempData["Error"] = "Ошибка системы: не найдены справочники статусов или методов доставки.";
+                TempData["Error"] = "Ошибка системы: справочники не заполнены.";
                 return RedirectToAction("Index");
             }
 
-            // 2. Создаем Заказ
-            var order = new Order
+            // ИСПОЛЬЗУЕМ ТРАНЗАКЦИЮ ДЛЯ БЕЗОПАСНОСТИ
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                UserId = user.UserId,
-                OrderStatusId = status.OrderStatusID,
-                DeliveryMethodId = delivery.DeliveryMethodId, // Проверь здесь имя свойства!
-                PaymentMethodId = payment.PaymentMethodId,
-                CreatedAt = DateTime.Now,
-                TotalAmount = user.CartItems.Sum(ci => ci.Product.Price * ci.Quantity)
-            };
-
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
-
-            // 3. Создаем позиции заказа
-            foreach (var item in user.CartItems)
-            {
-                _context.OrderItems.Add(new OrderItem
+                // 1. Создаем основной Заказ
+                var order = new Order
                 {
-                    OrderId = order.OrderId,
-                    ProductId = item.ProductId,
-                    Quantity = item.Quantity,
-                    Price = item.Product.Price
-                });
+                    UserId = user.UserId,
+                    OrderStatusId = status.OrderStatusID,
+                    DeliveryMethodId = delivery.DeliveryMethodId,
+                    PaymentMethodId = payment.PaymentMethodId,
+                    CreatedAt = DateTime.Now,
+                    TotalAmount = user.CartItems.Sum(ci => ci.Product.Price * ci.Quantity)
+                };
+
+                _context.Orders.Add(order);
+                await _context.SaveChangesAsync(); // Получаем Id заказа
+
+                // 2. Обрабатываем товары: создаем OrderItems и СПИСЫВАЕМ СКЛАД
+                foreach (var item in user.CartItems)
+                {
+                    // Находим товар в базе для обновления остатка
+                    var product = await _context.Products.FindAsync(item.ProductId);
+
+                    if (product == null) throw new Exception("Товар не найден");
+
+                    // ПРОВЕРКА: Хватает ли товара на складе?
+                    if (product.Stock < item.Quantity)
+                    {
+                        TempData["Error"] = $"Недостаточно товара '{product.Name}' на складе. В наличии: {product.Stock}";
+                        await transaction.RollbackAsync(); // Отменяем всё, что сделали выше
+                        return RedirectToAction("Index");
+                    }
+
+                    // --- ТВОЕ ТРЕБОВАНИЕ: СПИСАНИЕ ---
+                    product.Stock -= item.Quantity;
+                    // --------------------------------
+
+                    _context.OrderItems.Add(new OrderItem
+                    {
+                        OrderId = order.OrderId,
+                        ProductId = item.ProductId,
+                        Quantity = item.Quantity,
+                        Price = item.Product.Price
+                    });
+                }
+
+                // 3. Очищаем корзину
+                _context.CartItems.RemoveRange(user.CartItems);
+                await _context.SaveChangesAsync();
+
+                // 4. Подтверждаем транзакцию
+                await transaction.CommitAsync();
+
+                TempData["Success"] = "Заказ успешно оформлен! Товары списаны со склада.";
+                return RedirectToAction("Index", "Home");
             }
-
-            // 4. Очищаем корзину
-            _context.CartItems.RemoveRange(user.CartItems);
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = "Заказ успешно оформлен!";
-            return RedirectToAction("Index", "Home");
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                TempData["Error"] = "Произошла критическая ошибка при оформлении заказа.";
+                return RedirectToAction("Index");
+            }
         }
     }
 }
