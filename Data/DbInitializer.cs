@@ -22,11 +22,13 @@ namespace Apex7.Data
                 context.SaveChanges();
             }
 
+            
             // 2. ПОЛЬЗОВАТЕЛИ
             if (!context.Users.Any())
             {
                 var adminRole = context.Roles.First(r => r.Name == "Администратор").RoleId;
                 var guideRole = context.Roles.First(r => r.Name == "Гид").RoleId;
+                var managerRole = context.Roles.First(r => r.Name == "Менеджер").RoleId; // Находим роль Менеджера
 
                 context.Users.AddRange(
                     new User
@@ -46,13 +48,22 @@ namespace Apex7.Data
                         PhotoPath = "/images/guides/alex.jpg",
                         Description = "Профессиональный альпинист, 10 лет опыта.",
                         RegistrationDate = DateTime.Now
+                    },
+                    // ДОБАВЛЯЕМ МЕНЕДЖЕРА:
+                    new User
+                    {
+                        FullName = "Марина Менеджерова",
+                        Email = "manager@world.com",
+                        Password = "123",
+                        RoleId = managerRole,
+                        RegistrationDate = DateTime.Now
                     }
                 );
                 context.SaveChanges();
             }
 
             // 3. КАТЕГОРИИ И БРЕНДЫ 
-           
+
             if (!context.Categories.Any())
             {
                 context.Categories.AddRange(
@@ -199,15 +210,30 @@ namespace Apex7.Data
                 context.SaveChanges();
             }
 
-           
+
 
             // 5. ТУРЫ И СЛОЖНОСТЬ
+          
+            if (!context.ComplexityLevels.Any())
+            {
+                context.ComplexityLevels.AddRange(
+                    new ComplexityLevel { Name = "Легкий" },
+                    new ComplexityLevel { Name = "Средний" },
+                    new ComplexityLevel { Name = "Сложный" }
+                );
+
+                context.SaveChanges();
+            }
+
+            
+            var easy = context.ComplexityLevels.First(c => c.Name == "Легкий").ComplexityLevelId;
+            var medium = context.ComplexityLevels.First(c => c.Name == "Средний").ComplexityLevelId;
+            var hard = context.ComplexityLevels.First(c => c.Name == "Сложный").ComplexityLevelId;
+
+
+           
             if (!context.Tours.Any())
             {
-                var easy = context.ComplexityLevels.First(c => c.Name == "Легкий").ComplexityLevelId;
-                var hard = context.ComplexityLevels.First(c => c.Name == "Сложный").ComplexityLevelId;
-                var medium = context.ComplexityLevels.FirstOrDefault(c => c.Name == "Средний")?.ComplexityLevelId ?? easy;
-
                 context.Tours.AddRange(
                     new Tour { Name = "Килиманджаро", Region = "Африка", DurationDays = 8, ComplexityLevelId = hard, ImageUrl = "/images/news/kilim.jpg", Description = "Восхождение на высочайшую точку Африки через тропические леса к ледникам." },
                     new Tour { Name = "Базовый лагерь Эвереста", Region = "Непал", DurationDays = 14, ComplexityLevelId = hard, ImageUrl = "/images/tours/everest.png", Description = "Легендарный трек к подножию высочайшей горы мира через культуру шерпов." },
@@ -217,6 +243,7 @@ namespace Apex7.Data
                     new Tour { Name = "Лофотенские острова", Region = "Норвегия", DurationDays = 7, ComplexityLevelId = easy, ImageUrl = "/images/tours/lofoten.png", Description = "Живописные рыбацкие деревни и крутые скалы, вырастающие прямо из океана." },
                     new Tour { Name = "Долина гейзеров", Region = "Камчатка", DurationDays = 10, ComplexityLevelId = medium, ImageUrl = "/images/tours/kamchatka.png", Description = "Мир действующих вулканов, горячих источников и дикой природы Тихого океана." }
                 );
+
                 context.SaveChanges();
             }
             // 6. НОВОСТИ (Экспедиции)
@@ -247,6 +274,24 @@ namespace Apex7.Data
                         CreatedAt = DateTime.Now.AddDays(-2),
                         IsArchived = false
                     }
+                );
+                context.SaveChanges();
+            }
+            // 7. МЕТОДЫ ОПЛАТЫ И ДОСТАВКИ (Убедись, что они есть!)
+            if (!context.PaymentMethods.Any())
+            {
+                context.PaymentMethods.AddRange(
+                    new PaymentMethod { Name = "Картой онлайн", IsActive = true },
+                    new PaymentMethod { Name = "Наличными", IsActive = true }
+                );
+                context.SaveChanges();
+            }
+
+            if (!context.DeliveryMethods.Any())
+            {
+                context.DeliveryMethods.AddRange(
+                    new DeliveryMethod { Name = "Самовывоз", Price = 0, IsActive = true },
+                    new DeliveryMethod { Name = "Курьерская доставка", Price = 500, IsActive = true }
                 );
                 context.SaveChanges();
             }

@@ -1,0 +1,45 @@
+﻿@model IEnumerable<Apex7.Data.Entities.Order>
+
+<div class="container py-5 mt-5">
+    <h2 class="text-uppercase fw-black mb-4">Управление заказами</h2>
+    <div class="bg-white p-4 shadow-sm border">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>№ Заказа</th>
+                    <th>Клиент</th>
+                    <th>Сумма</th>
+                    <th>Статус</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>@order.OrderId</td>
+                        <td>@order.User.FullName</td>
+                        <td>@order.TotalAmount.ToString("N0") ₽</td>
+                        <td><span class="badge bg-dark">@order.OrderStatus.Name</span></td>
+                        <td>
+                            <form asp-controller="Manager" asp-action="UpdateOrderStatus" method="post" class="d-flex gap-2">
+                                <input type="hidden" name="orderId" value="@order.OrderId" />
+
+                                <!-- ДИНАМИЧЕСКИЙ СПИСОК СТАТУСОВ -->
+                                <select name="statusId" class="form-select form-select-sm" style="width: 150px;">
+                                    @foreach (var status in ViewBag.Statuses)
+                                    {
+                                        <option value="@status.OrderStatusID" selected="@(order.OrderStatusId == status.OrderStatusID ? "selected" : null)">
+                                            @status.Name
+                                        </option>
+                                    }
+                                </select>
+                                <button type="submit" class="btn btn-dark btn-sm">Обновить</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

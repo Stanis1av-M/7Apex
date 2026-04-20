@@ -35,8 +35,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ошибка при наполнении БД.");
+        throw; 
     }
 }
 // ============================================================

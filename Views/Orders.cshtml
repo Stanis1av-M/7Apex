@@ -1,0 +1,41 @@
+﻿@model IEnumerable<Apex7.Data.Entities.Order>
+
+<div class="container py-5 mt-5">
+    <h2 class="text-uppercase fw-black mb-4">Управление заказами</h2>
+
+    <div class="bg-white shadow-sm border p-4">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Заказ #</th>
+                    <th>Клиент</th>
+                    <th>Статус</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>@order.OrderId</td>
+                        <td>@order.User.FullName</td>
+                        <td>
+                            <span class="badge bg-secondary">@order.OrderStatus.Name</span>
+                        </td>
+                        <td>
+                            <form asp-action="UpdateOrderStatus" method="post" class="d-flex gap-2">
+                                <input type="hidden" name="orderId" value="@order.OrderId" />
+                                <select name="statusId" class="form-select form-select-sm" style="width: 150px;">
+                                    <option value="1">Новый</option>
+                                    <option value="2">Оплачен</option>
+                                    <option value="5">Завершен</option>
+                                </select>
+                                <button type="submit" class="btn btn-dark btn-sm">OK</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

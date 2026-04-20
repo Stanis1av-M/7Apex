@@ -1,0 +1,55 @@
+﻿@{
+    ViewData["Title"] = "Панель управления";
+}
+
+<div class="container py-5 mt-5">
+    <h1 class="fw-black text-uppercase mb-5">Панель управления</h1>
+
+    <div class="row g-4">
+        <!-- Заказы -->
+        <div class="col-md-4">
+            <a asp-controller="Manager" asp-action="Orders" class="text-decoration-none">
+                <div class="card h-100 p-4 border-0 shadow-sm text-center">
+                    <i class="bi bi-box-seam display-3 text-dark"></i>
+                    <h5 class="fw-bold mt-3">ЗАКАЗЫ</h5>
+                    <p class="small text-muted">Изменение статусов и обработка заявок</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Товары -->
+        <div class="col-md-4">
+            <a asp-controller="Shop" asp-action="Index" class="text-decoration-none">
+                <div class="card h-100 p-4 border-0 shadow-sm text-center">
+                    <i class="bi bi-tag display-3 text-dark"></i>
+                    <h5 class="fw-bold mt-3">ТОВАРЫ</h5>
+                    <p class="small text-muted">Управление ассортиментом и ценами</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Пользователи (только для админа) -->
+        @if (User.IsInRole("Администратор"))
+        {
+            <div class="col-md-4">
+                <a asp-controller="Admin" asp-action="Users" class="text-decoration-none">
+                    <div class="card h-100 p-4 border-0 shadow-sm text-center bg-dark text-white">
+                        <i class="bi bi-people display-3 text-warning"></i>
+                        <h5 class="fw-bold mt-3">ПОЛЬЗОВАТЕЛИ</h5>
+                        <p class="small text-white-50">Управление учетными записями</p>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+<style>
+    .hover-lift {
+        transition: 0.3s;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        }
+</style>

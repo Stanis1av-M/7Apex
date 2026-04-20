@@ -1,0 +1,29 @@
+﻿@model IEnumerable<Apex7.Data.Entities.Feedback>
+
+<div class="container py-5 mt-5">
+    <h2 class="text-uppercase fw-black mb-5">Входящие сообщения</h2>
+
+    <div class="bg-white shadow-sm border">
+        <table class="table table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Дата</th>
+                    <th>Имя</th>
+                    <th>Email</th>
+                    <th>Сообщение</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var msg in Model)
+                {
+                    <tr>
+                        <td class="small">@msg.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td class="fw-bold">@msg.Name</td>
+                        <td>@msg.Email</td>
+                        <td>@msg.Message</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -77,7 +77,11 @@
                         <span class="fw-bold">ИТОГО:</span>
                         <span class="fs-4 fw-black">@totalSum.ToString("N0") ₽</span>
                     </div>
-                    <button class="btn btn-light w-100 py-3 text-uppercase fw-bold ls-1 rounded-0">Оформить заказ</button>
+                    <form asp-controller="Cart" asp-action="Checkout" method="post">
+                        <button type="submit" class="btn btn-light w-100 py-3 text-uppercase fw-bold ls-1 rounded-0">
+                            Оформить заказ
+                        </button>
+                    </form>
                     <a asp-controller="Shop" asp-action="Index" class="d-block text-center text-white text-decoration-none small mt-3 opacity-50">Продолжить покупки</a>
                 </div>
             </div>

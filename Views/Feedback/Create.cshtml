@@ -1,0 +1,48 @@
+﻿@model Apex7.Data.Entities.Feedback
+
+@{
+    ViewData["Title"] = "Обратная связь";
+   
+    var name = TempData["FeedbackName"]?.ToString() ?? "";
+    var email = TempData["FeedbackEmail"]?.ToString() ?? "";
+    var message = TempData["FeedbackData"]?.ToString() ?? "";
+}
+
+<section class="tour-hero">
+    <div class="container text-center">
+        <h1 class="display-5 fw-black text-uppercase">Обратная связь</h1>
+        <p class="text-muted">Есть вопросы? Напишите нам.</p>
+    </div>
+</section>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-dark border-0 rounded-0 small fw-bold text-uppercase ls-1 py-3 mb-4 text-center">
+                    <i class="bi bi-check-circle me-2"></i> @TempData["Success"]
+                </div>
+            }
+
+            <form asp-action="Create" method="post" class="bg-white p-4 shadow-sm border-0">
+                <div class="mb-3">
+                    <label class="small fw-bold text-uppercase ls-1">Имя</label>
+                    <input asp-for="Name" value="@name" class="form-control rounded-0 border-dark shadow-none py-2" required />
+                </div>
+                <div class="mb-3">
+                    <label class="small fw-bold text-uppercase ls-1">Email</label>
+                    <input asp-for="Email" value="@email" class="form-control rounded-0 border-dark shadow-none py-2" required />
+                </div>
+                <div class="mb-4">
+                    <label class="small fw-bold text-uppercase ls-1">Сообщение</label>
+                    <textarea asp-for="Message" class="form-control rounded-0 border-dark shadow-none" rows="5" required>@message</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-dark w-100 py-3 text-uppercase fw-bold ls-1">
+                    Отправить сообщение
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

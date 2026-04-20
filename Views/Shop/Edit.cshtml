@@ -1,0 +1,68 @@
+﻿@model Apex7.Data.Entities.Product
+
+<div class="container py-5 mt-5">
+    <h2 class="text-uppercase fw-black mb-4">Редактирование: @Model.Name</h2>
+
+    <form asp-action="Edit" method="post" enctype="multipart/form-data" class="bg-white p-5 border shadow-sm">
+        <input type="hidden" asp-for="ProductId" />
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="small fw-bold text-uppercase">Название</label>
+                <input asp-for="Name" class="form-control rounded-0" required />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="small fw-bold text-uppercase">Артикул</label>
+                <input asp-for="Article" class="form-control rounded-0" />
+            </div>
+        </div>
+
+        <!-- ИСПРАВЛЕННЫЙ БЛОК: Выбор категории и производителя -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="small fw-bold text-uppercase">Категория</label>
+                <select asp-for="CategoryId" class="form-control rounded-0"
+                        asp-items="@(new SelectList(ViewBag.Categories, "CategoryId", "Name"))">
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="small fw-bold text-uppercase">Производитель</label>
+                <select asp-for="ManufacturerId" class="form-control rounded-0"
+                        asp-items="@(new SelectList(ViewBag.Manufacturers, "ManufactureId", "Name"))">
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="small fw-bold text-uppercase">Цена</label>
+                <input asp-for="Price" class="form-control rounded-0" />
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="small fw-bold text-uppercase">Старая цена</label>
+                <input asp-for="OldPrice" class="form-control rounded-0" />
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="small fw-bold text-uppercase">Скидка (%)</label>
+                <input asp-for="Discount" class="form-control rounded-0" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="small fw-bold text-uppercase">Описание</label>
+            <textarea asp-for="Description" class="form-control rounded-0" rows="3"></textarea>
+        </div>
+
+        <div class="mb-4">
+            <label class="small fw-bold text-uppercase">Новое фото</label>
+            <input type="file" name="imageFile" class="form-control rounded-0" accept="image/*" />
+        </div>
+
+        <div class="form-check mb-4">
+            <input asp-for="IsVisible" class="form-check-input" type="checkbox" id="visibleCheck">
+            <label class="form-check-label small fw-bold" for="visibleCheck">Товар виден на сайте</label>
+        </div>
+
+        <button type="submit" class="btn btn-dark w-100 py-3 text-uppercase fw-bold ls-1">Сохранить изменения</button>
+    </form>
+</div>

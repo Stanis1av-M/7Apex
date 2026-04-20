@@ -1,52 +1,97 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Apex7.Data;
+using Apex7.Data.Entities; // Обязательно добавь для Product
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Apex7.Controllers
 {
-    // Обязательно: : Controller (это дает доступ к ViewBag и View)
     public class ShopController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        // Конструктор (внедряет базу данных в контроллер)
         public ShopController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // Основной метод страницы магазина
+        // Основной метод магазина (доступен всем)
         public async Task<IActionResult> Index(string searchString, int? categoryId)
         {
-            // 1. Получаем базу запроса
             var query = _context.Products
                 .Include(p => p.Category)
                 .Include(p => p.Manufacturer)
                 .Where(p => p.IsVisible);
 
-            // 2. Логика поиска
             if (!string.IsNullOrEmpty(searchString))
             {
                 query = query.Where(p => p.Name.Contains(searchString) || p.Article.Contains(searchString));
             }
 
-            // 3. Фильтр по категории
             if (categoryId.HasValue)
             {
                 query = query.Where(p => p.CategoryId == categoryId);
             }
 
-            // 4. Загружаем список категорий для выпадающего списка
             ViewBag.Categories = await _context.Categories.ToListAsync();
-
-            // Сохраняем текущий поиск, чтобы он не пропадал из поля ввода
             ViewBag.CurrentSearch = searchString;
+            ViewBag.SelectedCategory = categoryId;
 
-            // 5. Выполняем запрос и отправляем в View
             var products = await query.ToListAsync();
             return View(products);
+        }
+
+
+
+        [Authorize(Roles = "Менеджер, Администратор")]
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound();
+
+           
+            ViewBag.Categories = await _context.Categories.ToListAsync();
+            ViewBag.Manufacturers = await _context.Manufacturers.ToListAsync();
+
+            return View(product);
+        }
+
+        [Authorize(Roles = "Менеджер, Администратор")]
+        [HttpPost]
+        [HttpPost]
+        public async Task<IActionResult> Edit(Product model, IFormFile? imageFile)
+        {
+            var product = await _context.Products.FindAsync(model.ProductId);
+            if (product == null) return NotFound();
+
+            // Обновляем данные
+            product.Name = model.Name;
+            product.Price = model.Price;
+            product.Stock = model.Stock;
+            product.IsVisible = model.IsVisible;
+            product.CategoryId = model.CategoryId;           
+            product.ManufacturerId = model.ManufacturerId; 
+
+
+            
+            // Логика загрузки фото
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/products", fileName);
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+                product.ImageUrl = "/images/products/" + fileName;
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Товар обновлен!";
+            return RedirectToAction("Index");
         }
     }
 }
