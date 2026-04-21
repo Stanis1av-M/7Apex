@@ -1,0 +1,126 @@
+﻿@model IEnumerable<Apex7.Data.Entities.User>
+
+@{
+    ViewData["Title"] = "Управление пользователями";
+}
+
+<div class="container py-5 mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="fw-black text-uppercase m-0">Пользователи</h1>
+        <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-dark">
+            <i class="bi bi-arrow-left"></i> Назад в панель
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle m-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Email</th>
+                            <th>Имя пользователя</th>
+                            <th>Текущая роль</th>
+                            <th>Новая роль</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var user in Model)
+                            {
+                                // Цвет для текущей роли (просто для отображения)
+                                string badgeClass = "bg-secondary";
+                                string roleName = "Не назначена";
+                                if (user.Role != null)
+                                {
+                                    roleName = user.Role.Name;
+                                    badgeClass = roleName switch
+                                    {
+                                        "Администратор" => "bg-danger",
+                                        "Менеджер" => "bg-primary",
+                                        "Гид" => "bg-info text-dark",
+                                        "Клиент" => "bg-success",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+
+                                <tr>
+                                    <td>@user.Email</td>
+                                    <td>@user.FullName</td>
+                                    <td><span class="badge @badgeClass">@roleName</span></td>
+                                    <td>
+                                        <form asp-action="UpdateRole" asp-controller="Admin" method="post" class="d-flex gap-2 align-items-center">
+                                            <input type="hidden" name="userId" value="@user.UserId" />
+                                            <select name="newRoleId" class="form-select form-select-sm" style="width: auto;">
+                                                @if (ViewBag.RolesList != null)
+                                                {
+                                                    foreach (var role in ViewBag.RolesList as List<Apex7.Data.Entities.Role>)
+                                                    {
+                                                        if (role.RoleId == user.RoleId)
+                                                        {
+                                                            <option value="@role.RoleId" selected>@role.Name</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@role.RoleId">@role.Name</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">Сохранить</button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form asp-action="DeleteUser" asp-controller="Admin" method="post" onsubmit="return confirm('Удалить пользователя @user.Email?');">
+                                            <input type="hidden" name="userId" value="@user.UserId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i> Удалить
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-5">
+                                    <i class="bi bi-people fs-1"></i>
+                                    <p class="mt-2">Пользователи не найдены</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-lift {
+        transition: 0.3s;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        }
+</style>
