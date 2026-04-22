@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Apex7.Data;
 using Apex7.Data.Entities;
+using System.Security.Claims;
 
 namespace Apex7.Controllers
 {
@@ -15,13 +16,20 @@ namespace Apex7.Controllers
         // Открыть страницу Избранного
         public async Task<IActionResult> Index()
         {
-            var userEmail = User.Identity!.Name;
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+            // 1. Берем ID сразу из "паспорта" (куки), без лишних запросов в базу!
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            // Если ID нет или он кривой — выкидываем на страницу входа
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // 2. Ищем товары, используя уже готовую переменную userId
             var favorites = await _context.FavoriteProducts
                 .Include(f => f.Product)
-                .ThenInclude(p => p.Manufacturer) // Чтобы выводить бренд
-                .Where(f => f.UserId == user!.UserId)
+                .ThenInclude(p => p.Manufacturer) // Выводим бренд
+                .Where(f => f.UserId == userId)
                 .ToListAsync();
 
             return View(favorites);
@@ -31,11 +39,14 @@ namespace Apex7.Controllers
         [HttpPost]
         public async Task<IActionResult> Toggle(int productId, string returnUrl)
         {
-            var userEmail = User.Identity!.Name;
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
 
             var existingFavorite = await _context.FavoriteProducts
-                .FirstOrDefaultAsync(f => f.UserId == user!.UserId && f.ProductId == productId);
+                .FirstOrDefaultAsync(f => f.UserId == userId && f.ProductId == productId);
 
             if (existingFavorite != null)
             {
@@ -47,7 +58,7 @@ namespace Apex7.Controllers
                 // Если нет — добавляем
                 _context.FavoriteProducts.Add(new FavoriteProduct
                 {
-                    UserId = user!.UserId,
+                    UserId = userId,
                     ProductId = productId,
                     AddedAt = DateTime.Now
                 });
@@ -56,7 +67,12 @@ namespace Apex7.Controllers
             await _context.SaveChangesAsync();
 
             // Возвращаем пользователя туда, откуда он нажал кнопку
-            return Redirect(returnUrl);
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction("Index"); // Запасной вариант, если returnUrl пустой
         }
     }
 }

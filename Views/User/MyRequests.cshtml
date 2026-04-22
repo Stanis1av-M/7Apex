@@ -1,0 +1,123 @@
+﻿@model IEnumerable<Apex7.Data.Entities.Feedback>
+@using Apex7.Data.Entities
+
+@{
+    ViewData["Title"] = "Мои обращения";
+}
+
+<div class="container py-5 mt-4">
+    <div class="d-flex align-items-center mb-4">
+        <h2 class="fw-800 text-uppercase m-0">Мои <span class="text-primary">Обращения</span></h2>
+        <span class="badge bg-light text-dark border ms-3 rounded-pill">Всего: @Model.Count()</span>
+    </div>
+
+    <div class="row">
+        @if (!Model.Any())
+        {
+            <div class="col-12 text-center py-5 shadow-sm rounded-4 bg-white border">
+                <i class="bi bi-chat-left-dots fs-1 text-muted opacity-25"></i>
+                <h4 class="mt-3 fw-bold">У вас пока нет обращений</h4>
+                <p class="text-muted">Если у вас есть вопросы по турам или снаряжению, мы всегда рады помочь.</p>
+                <a asp-action="Contact" class="btn btn-primary rounded-pill px-4 mt-2 shadow-sm">Написать нам</a>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <div class="col-12 mb-4">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden hover-lift" style="transition: 0.3s;">
+                        @* Шапка карточки со статусом *@
+                        <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-sm bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-clock-history text-primary"></i>
+                                </div>
+                                <div>
+                                    <div class="small fw-bold text-dark">Заявка #@item.FeedbackID</div>
+                                    <div class="small text-muted">@item.CreatedAt.ToString("dd MMMM yyyy, HH:mm")</div>
+                                </div>
+                            </div>
+
+                            @* Логика статусов *@
+                            <div>
+                                @switch (item.Status)
+                                {
+                                    case FeedbackStatus.Pending:
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-2">
+                                            <i class="bi bi-hourglass-split me-1"></i> В обработке
+                                        </span>
+                                        break;
+                                    case FeedbackStatus.Accepted:
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Принято
+                                        </span>
+                                        break;
+                                    case FeedbackStatus.Rejected:
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2">
+                                            <i class="bi bi-x-circle-fill me-1"></i> Отклонено
+                                        </span>
+                                        break;
+                                }
+                            </div>
+                        </div>
+
+                        @* Текст вопроса *@
+                        <div class="card-body px-4 pb-4">
+                            <div class="bg-light p-3 rounded-3 mb-3 border-start border-primary border-4">
+                                <span class="small text-muted text-uppercase fw-bold ls-1 d-block mb-1">Ваш вопрос:</span>
+                                <p class="mb-0 text-dark" style="white-space: pre-wrap;">@item.Message</p>
+                            </div>
+
+                            @* Ответ админа (показывается только если он есть) *@
+                            @if (!string.IsNullOrEmpty(item.AdminResponse))
+                            {
+                                <div class="p-3 rounded-3" style="background-color: #f0f7ff; border-left: 4px solid #007bff;">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-reply-fill text-primary me-2"></i>
+                                        <span class="small text-primary text-uppercase fw-bold ls-1">Ответ администрации:</span>
+                                    </div>
+                                    <p class="mb-0 fw-medium">@item.AdminResponse</p>
+                                </div>
+                            }
+                            else if (item.Status == FeedbackStatus.Pending)
+                            {
+                                <div class="text-center py-2 mt-2">
+                                    <span class="small text-muted italic">Ожидайте, администратор скоро ответит на ваш запрос.</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<style>
+    .fw-800 {
+        font-weight: 800;
+    }
+
+    .ls-1 {
+        letter-spacing: 1px;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+    }
+
+    /* Стили для мягких цветов статусов (если Bootstrap 5.3+ не подхватил сам) */
+    .bg-success-subtle {
+        background-color: #d1e7dd;
+    }
+
+    .bg-warning-subtle {
+        background-color: #fff3cd;
+    }
+
+    .bg-danger-subtle {
+        background-color: #f8d7da;
+    }
+</style>

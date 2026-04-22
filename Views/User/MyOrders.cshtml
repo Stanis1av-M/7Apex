@@ -1,0 +1,102 @@
+﻿@model IEnumerable<Apex7.Data.Entities.Order>
+
+@{
+    ViewData["Title"] = "Мои заказы";
+}
+
+<div class="container py-5 mt-4">
+    <div class="d-flex align-items-center mb-4">
+        <h2 class="fw-800 text-uppercase m-0">Мои <span class="text-primary">Заказы</span></h2>
+        <span class="badge bg-light text-dark border ms-3 rounded-pill">Всего: @Model.Count()</span>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 shadow-sm rounded-4 bg-white border">
+            <i class="bi bi-bag-x fs-1 text-muted opacity-25"></i>
+            <h4 class="mt-3 fw-bold">У вас пока нет заказов</h4>
+            <p class="text-muted">Загляните в наш магазин, там много интересного снаряжения!</p>
+            <a asp-controller="Shop" asp-action="Index" class="btn btn-primary rounded-pill px-4 mt-2 shadow-sm">Перейти в магазин</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var order in Model)
+            {
+                <div class="col-12 mb-4">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+                        @* Шапка заказа *@
+                        <div class="card-header bg-light border-0 pt-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <span class="fw-bold text-dark me-3">Заказ #@order.OrderId</span>
+                                <span class="small text-muted"><i class="bi bi-calendar-event me-1"></i> @order.CreatedAt.ToString("dd.MM.yyyy HH:mm")</span>
+                            </div>
+                            <div>
+                                @* Цвет бейджа зависит от статуса заказа *@
+                                @{
+                                    var badgeClass = order.OrderStatusId switch
+                                    {
+                                        1 => "bg-warning text-dark",    // В обработке
+                                        2 => "bg-info text-white",      // Оплачен
+                                        3 => "bg-primary text-white",   // В пути
+                                        4 => "bg-success text-white",   // Доставлен
+                                        _ => "bg-secondary text-white"
+                                    };
+                                }
+                                <span class="badge @badgeClass rounded-pill px-3 py-2">
+                                    @(order.OrderStatus?.Name ?? "Неизвестно")
+                                </span>
+                            </div>
+                        </div>
+
+                        @* Список товаров в этом заказе *@
+                        <div class="card-body px-4 py-3">
+                            <div class="table-responsive">
+                                <table class="table table-borderless table-sm align-middle mb-0">
+                                    <tbody>
+                                        @if (order.OrderItems != null && order.OrderItems.Any())
+                                        {
+                                            foreach (var item in order.OrderItems)
+                                            {
+                                                <tr>
+                                                    <td style="width: 50px;">
+                                                        <i class="bi bi-box-seam text-muted"></i>
+                                                    </td>
+                                                    <td class="fw-medium text-dark">@(item.Product?.Name ?? "Товар")</td>
+                                                    <td class="text-muted small text-center">@item.Quantity шт.</td>
+                                                    @* Замени Price на точное название свойства цены в твоей модели OrderItem, если оно отличается *@
+                                                    <td class="text-end fw-bold">@((item.Price * item.Quantity).ToString("C0", new System.Globalization.CultureInfo("ru-RU")))</td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        @* Итого *@
+                        <div class="card-footer bg-white border-top border-light px-4 py-3 text-end">
+                            <span class="text-muted small me-2 text-uppercase fw-bold">Сумма заказа:</span>
+                            @* Если в Order нет свойства TotalAmount, можно использовать сумму OrderItems *@
+                            <span class="fs-5 fw-900 text-dark">
+                                @(order.OrderItems?.Sum(i => i.Price * i.Quantity).ToString("C0", new System.Globalization.CultureInfo("ru-RU")))
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .fw-800 {
+        font-weight: 800;
+    }
+
+    .fw-900 {
+        font-weight: 900;
+    }
+</style>

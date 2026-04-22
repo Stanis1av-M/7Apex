@@ -1,0 +1,110 @@
+﻿@model IEnumerable<Apex7.Data.Entities.News>
+
+<div class="container py-5 mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-800 text-uppercase m-0">Управление <span class="text-primary">Контентом</span></h1>
+
+        @* Кнопка создания доступна только Админу *@
+        @if (User.IsInRole("Администратор"))
+        {
+            <a asp-action="CreateNews" class="btn btn-dark rounded-pill px-4 shadow-sm hover-lift">
+                <i class="bi bi-plus-lg me-2"></i> Новая запись
+            </a>
+        }
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light text-muted small fw-bold">
+                <tr>
+                    <th class="ps-4 py-3">ПРЕВЬЮ</th>
+                    <th>ЗАГОЛОВОК</th>
+                    <th>ДАТА СОЗДАНИЯ</th>
+                    <th class="text-center">СТАТУС</th>
+                    <th class="pe-4 text-end">УПРАВЛЕНИЕ</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="@(item.IsDeleted ? "bg-light opacity-50" : "")"
+                        style="@(item.IsDeleted ? "filter: grayscale(1); transition: 0.3s;" : "transition: 0.3s;")">
+
+                        <td class="ps-4">
+                            <img src="@(string.IsNullOrEmpty(item.ImageURL) ? "/images/no-photo.jpg" : item.ImageURL)"
+                                 class="rounded-3 shadow-sm" style="width: 70px; height: 45px; object-fit: cover;" />
+                        </td>
+
+                        <td>
+                            <div class="fw-bold @(item.IsDeleted ? "text-decoration-line-through text-muted" : "")">
+                                @item.Title
+                            </div>
+                        </td>
+
+                        <td class="text-muted small">@item.CreatedAt.ToString("dd.MM.yyyy")</td>
+
+                        <td class="text-center">
+                            @if (item.IsDeleted)
+                            {
+                                <span class="badge bg-danger rounded-pill px-3">Удалена</span>
+                            }
+                            else
+                            {
+                                <span class="badge @(item.IsArchived ? "bg-secondary" : "bg-success-subtle text-success") rounded-pill px-3">
+                                    @(item.IsArchived ? "В архиве" : "Активна")
+                                </span>
+                            }
+                        </td>
+
+                        <td class="pe-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                @if (User.IsInRole("Администратор"))
+                                {
+                                    if (item.IsDeleted)
+                                    {
+                                        <form asp-action="RestoreNews" asp-route-id="@item.NewsID" method="post">
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 fw-bold shadow-sm hover-lift">
+                                                <i class="bi bi-arrow-counterclockwise me-1"></i> Возобновить
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="EditNews" asp-route-id="@item.NewsID" class="btn btn-link text-primary p-0 hover-lift">
+                                            <i class="bi bi-pencil-square fs-5"></i>
+                                        </a>
+
+                                        <form asp-action="DeleteNews" asp-route-id="@item.NewsID" method="post">
+                                            <button type="submit" class="btn btn-link text-danger p-0 hover-lift">
+                                                <i class="bi bi-trash3 fs-5"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                }
+                                else
+                                {
+                                    @* Менеджеры видят пустую иконку или текст "Только чтение" *@
+                                    <span class="text-muted small italic"><i class="bi bi-lock-fill"></i></span>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .fw-800 {
+        font-weight: 800;
+    }
+
+    .hover-lift {
+        transition: 0.2s;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-2px);
+        }
+</style>

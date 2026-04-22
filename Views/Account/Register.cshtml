@@ -7,46 +7,96 @@
 <div class="container flex-grow-1 d-flex align-items-center justify-content-center py-5">
     <div class="col-12 col-md-6 col-lg-5">
         <div class="text-center mb-5">
-            <h6 class="text-muted text-uppercase ls-2 small mb-2">Станьте частью команды</h6>
+            <h6 class="text-muted text-uppercase ls-2 small mb-2">Станьте частью команды 7apex</h6>
             <h1 class="fw-black text-uppercase ls-1">Регистрация</h1>
         </div>
 
-        <form asp-action="Register" method="post" class="bg-white p-4 border shadow-sm">
-            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+        <form asp-action="Register" method="post" class="bg-white p-4 border border-dark shadow-sm">
+
+            @* Сводка общих ошибок (например, если Email уже занят) *@
+            <div asp-validation-summary="ModelOnly" class="text-danger small fw-bold text-uppercase mb-3"></div>
 
             <div class="mb-3">
-                <label asp-for="FullName" class="small text-uppercase fw-bold ls-1 mb-1">Полное имя</label>
-                <input asp-for="FullName" class="form-control rounded-0 border-dark shadow-none" placeholder="Иван Иванов" />
-                <span asp-validation-for="FullName" class="text-danger small"></span>
+                <label asp-for="FullName" class="small text-uppercase fw-bold ls-1 mb-1 d-block">Полное имя</label>
+                @* Добавлен id="fullNameInput" *@
+                <input asp-for="FullName" id="fullNameInput" class="form-control rounded-0 border-dark shadow-none py-2" placeholder="Иван Иванов" autocomplete="off" />
+                <span asp-validation-for="FullName" class="text-danger small fw-bold text-uppercase mt-1 d-block" style="font-size: 0.65rem;"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Email" class="small text-uppercase fw-bold ls-1 mb-1">Email</label>
-                <input asp-for="Email" class="form-control rounded-0 border-dark shadow-none" />
-                <span asp-validation-for="Email" class="text-danger small"></span>
+                <label asp-for="Email" class="small text-uppercase fw-bold ls-1 mb-1 d-block">Электронная почта</label>
+                <input asp-for="Email" class="form-control rounded-0 border-dark shadow-none py-2" placeholder="email@mail.ru" />
+                <span asp-validation-for="Email" class="text-danger small fw-bold text-uppercase mt-1 d-block" style="font-size: 0.65rem;"></span>
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label asp-for="Password" class="small text-uppercase fw-bold ls-1 mb-1">Пароль</label>
-                    <input asp-for="Password" type="password" class="form-control rounded-0 border-dark shadow-none" />
-                    <span asp-validation-for="Password" class="text-danger small"></span>
+                    <label asp-for="Password" class="small text-uppercase fw-bold ls-1 mb-1 d-block">Пароль</label>
+                    <input asp-for="Password" type="password" class="form-control rounded-0 border-dark shadow-none py-2" placeholder="••••••" />
+                    <span asp-validation-for="Password" class="text-danger small fw-bold text-uppercase mt-1 d-block" style="font-size: 0.65rem;"></span>
                 </div>
                 <div class="col-md-6 mb-4">
-                    <label asp-for="ConfirmPassword" class="small text-uppercase fw-bold ls-1 mb-1">Повтор</label>
-                    <input asp-for="ConfirmPassword" type="password" class="form-control rounded-0 border-dark shadow-none" />
-                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    <label asp-for="ConfirmPassword" class="small text-uppercase fw-bold ls-1 mb-1 d-block">Повтор</label>
+                    <input asp-for="ConfirmPassword" type="password" class="form-control rounded-0 border-dark shadow-none py-2" placeholder="••••••" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small fw-bold text-uppercase mt-1 d-block" style="font-size: 0.65rem;"></span>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-dark w-100 py-3 text-uppercase fw-bold ls-1 mb-3">
+            <button type="submit" class="btn btn-dark w-100 py-3 text-uppercase fw-bold ls-1 mb-3 rounded-0 transition-3">
                 Зарегистрироваться
             </button>
 
-            <div class="text-center mt-3">
-                <p class="small text-muted mb-0">Уже есть аккаунт?</p>
-                <a asp-action="Login" class="text-dark fw-bold small text-uppercase text-decoration-none border-bottom border-dark pb-1">Войти в систему</a>
+            <div class="text-center mt-3 pt-3 border-top border-light">
+                <p class="small text-muted mb-2 text-uppercase ls-1" style="font-size: 0.7rem;">Уже есть аккаунт?</p>
+                <a asp-action="Login" class="text-dark fw-bold small text-uppercase text-decoration-none border-bottom border-2 border-dark pb-1 hover-opacity">
+                    Войти в систему
+                </a>
             </div>
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Блокировка ввода цифр и спецсимволов в поле ФИО
+        document.getElementById('fullNameInput').addEventListener('input', function (e) {
+            // Регулярное выражение: всё, что НЕ буквы (RU/EN), пробел или дефис
+            const regex = /[^a-zA-Zа-яА-ЯёЁ\s\-]/g;
+            // Заменяем запрещенные символы на пустоту прямо при вводе
+            this.value = this.value.replace(regex, '');
+        });
+    </script>
+}
+
+<style>
+    .fw-black {
+        font-weight: 900;
+    }
+
+    .ls-1 {
+        letter-spacing: 1px;
+    }
+
+    .ls-2 {
+        letter-spacing: 2px;
+    }
+
+    .transition-3 {
+        transition: 0.3s;
+    }
+
+    .btn-dark:hover {
+        background-color: #333;
+    }
+
+    .form-control:focus {
+        border-color: #000 !important;
+        background-color: #fcfcfc;
+    }
+
+    .hover-opacity:hover {
+        opacity: 0.7;
+    }
+</style>

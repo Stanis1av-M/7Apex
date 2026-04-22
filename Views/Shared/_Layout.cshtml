@@ -9,26 +9,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&display=swap" rel="stylesheet">
 
-    <!-- CSS (Используем CDN для надежности) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/validation.css" asp-append-version="true" />
 </head>
 
-<body class="d-flex flex-column h-100 bg-white">
+<body class="d-flex flex-column h-100 bg-white shadow-sm">
 
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-black fixed-top py-3 shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-black fixed-top py-3 shadow-sm border-bottom border-secondary">
             <div class="container">
-                <a class="navbar-brand fw-bold text-uppercase letter-spacing-2"
-                   asp-controller="Home" asp-action="Index">
+                <a class="navbar-brand fw-bold text-uppercase ls-2" asp-controller="Home" asp-action="Index">
                     7apex <span class="fw-light text-muted">Tours</span>
                 </a>
 
-                <button class="navbar-toggler" type="button"
-                        data-bs-toggle="collapse" data-bs-target="#navbarContent"
-                        aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
@@ -36,30 +33,28 @@
                     <ul class="navbar-nav align-items-center">
 
                         <li class="nav-item">
-                            <a class="nav-link text-uppercase fw-bold px-3 small"
-                               asp-controller="Tours" asp-action="Index">Маршруты</a>
+                            <a class="nav-link text-uppercase fw-bold px-3 small" asp-controller="Tours" asp-action="Index">Маршруты</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link text-uppercase fw-bold px-3 small"
-                               asp-controller="Shop" asp-action="Index">Магазин</a>
+                            <a class="nav-link text-uppercase fw-bold px-3 small" asp-controller="Shop" asp-action="Index">Магазин</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link text-uppercase fw-bold px-3 small"
-                               asp-controller="Home" asp-action="About">О нас</a>
+                            <a class="nav-link text-uppercase fw-bold px-3 small" asp-controller="Home" asp-action="About">О нас</a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-uppercase fw-bold px-3 small"
-                               asp-controller="Feedback" asp-action="Create">
-                                Связаться с нами
-                            </a>
-                        </li>
+                        @if (!User.IsInRole("Администратор") && !User.IsInRole("Менеджер"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-uppercase fw-bold px-3 small text-info" asp-controller="User" asp-action="Contact">
+                                    <i class="bi bi-chat-left-dots me-1"></i> Поддержка
+                                </a>
+                            </li>
+                        }
 
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            <!-- Иконки Избранное / Корзина -->
                             <li class="nav-item ms-lg-3">
                                 <a class="nav-link text-white px-2" title="Избранное" asp-controller="Favorites" asp-action="Index">
                                     <i class="bi bi-heart fs-5"></i>
@@ -72,31 +67,46 @@
                                 </a>
                             </li>
 
-                            <!-- ВЫПАДАЮЩЕЕ МЕНЮ ПОЛЬЗОВАТЕЛЯ -->
                             <li class="nav-item dropdown ms-lg-3">
-                                <a class="nav-link dropdown-toggle text-white text-uppercase fw-bold small border border-secondary px-3 py-2"
-                                   href="#" id="userDropdownMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle text-white text-uppercase fw-bold small border border-secondary px-3 py-2 rounded-1"
+                                   href="#" id="userDropdownMenu" role="button" data-bs-toggle="dropdown">
                                     <i class="bi bi-person-circle me-1"></i> @User.Identity.Name
                                 </a>
 
-                                <ul class="dropdown-menu dropdown-menu-end bg-black border border-secondary shadow-lg mt-2" aria-labelledby="userDropdownMenu">
+                                <ul class="dropdown-menu dropdown-menu-end bg-black border border-secondary shadow-lg mt-2 py-2 rounded-3">
                                     <li>
                                         <a class="dropdown-item text-white small text-uppercase fw-bold ls-1 py-2"
-                                           asp-controller="Profile" asp-action="Index">Профиль</a>
+                                           asp-controller="User" asp-action="Index">
+                                            <i class="bi bi-person me-2"></i> Профиль
+                                        </a>
                                     </li>
+
+                                    @if (User.IsInRole("Клиент"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item text-white small text-uppercase fw-bold ls-1 py-2"
+                                               asp-controller="User" asp-action="MyRequests">
+                                                <i class="bi bi-envelope-paper me-2"></i> Мои обращения
+                                            </a>
+                                        </li>
+                                    }
 
                                     <li>
                                         <a class="dropdown-item text-white small text-uppercase fw-bold ls-1 py-2"
-                                           asp-controller="Cart" asp-action="Index">Мои заказы</a>
+                                           asp-controller="User" asp-action="MyOrders">
+                                            <i class="bi bi-bag-check me-2"></i> Мои заказы
+                                        </a>
                                     </li>
 
                                     @if (User.IsInRole("Администратор") || User.IsInRole("Менеджер"))
                                     {
                                         <li><hr class="dropdown-divider bg-secondary"></li>
-                                        <li class="px-3 py-1 small text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Управление</li>
+                                        <li class="px-3 py-1 small text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Staff Only</li>
                                         <li>
                                             <a class="dropdown-item text-warning small text-uppercase fw-bold ls-1 py-2"
-                                               asp-controller="Admin" asp-action="Index">Панель управления</a>
+                                               asp-controller="Admin" asp-action="Index">
+                                                <i class="bi bi-speedometer2 me-2"></i> Админ-панель
+                                            </a>
                                         </li>
                                     }
 
@@ -104,7 +114,9 @@
 
                                     <li>
                                         <a class="dropdown-item text-danger small text-uppercase fw-bold ls-1 py-2"
-                                           asp-controller="Account" asp-action="Logout">Выход</a>
+                                           asp-controller="Account" asp-action="Logout">
+                                            <i class="bi bi-box-arrow-right me-2"></i> Выход
+                                        </a>
                                     </li>
                                 </ul>
                             </li>
@@ -117,20 +129,47 @@
                                    asp-controller="Account" asp-action="Login">Войти</a>
                             </li>
                         }
-
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
 
-    <main role="main" class="flex-shrink-0 flex-grow-1" style="padding-top: 85px;">
+    <main role="main" class="flex-shrink-0 flex-grow-1" style="padding-top: 95px;">
+
+        <!-- СЕКЦИЯ УВЕДОМЛЕНИЙ -->
+        <div class="container mt-3">
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+                        <div>
+                            <strong>Ошибка!</strong> @TempData["Error"]
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill me-3 fs-4"></i>
+                        <div>
+                            <strong>Успех!</strong> @TempData["Success"]
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+        </div>
+
         @RenderBody()
     </main>
 
-    <footer class="footer mt-auto bg-black text-white pt-5 pb-4 position-relative overflow-hidden">
-        <div class="mountain-decor"></div>
-
+    <footer class="footer mt-auto bg-black text-white pt-5 pb-4 position-relative overflow-hidden border-top border-secondary">
         <div class="container position-relative" style="z-index: 2;">
             <div class="row">
                 <div class="col-md-4 mb-4">
@@ -147,30 +186,27 @@
                 </div>
 
                 <div class="col-md-4 mb-4 text-end">
-                    <h5 class="text-uppercase fw-bold mb-4 ls-1">Следите за нами</h5>
+                    <h5 class="text-uppercase fw-bold mb-4 ls-1">Соцсети</h5>
                     <div class="d-flex justify-content-end gap-3 fs-5">
-                        <!-- Добавил hover-эффект для соцсетей -->
-                        <a href="#" class="text-white opacity-75 text-decoration-none"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="text-white opacity-75 text-decoration-none ms-3"><i class="bi bi-telegram"></i></a>
-                        <a href="#" class="text-white opacity-75 text-decoration-none ms-3"><i class="bi bi-youtube"></i></a>
+                        <a href="#" class="text-white opacity-75"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white opacity-75"><i class="bi bi-telegram"></i></a>
+                        <a href="#" class="text-white opacity-75"><i class="bi bi-youtube"></i></a>
                     </div>
                 </div>
             </div>
 
             <div class="border-top border-secondary pt-4 mt-4 text-center">
                 <p class="text-muted small mb-0">
-                    &copy; @DateTime.Now.Year - 7apex Tours. Все права защищены.
+                    &copy; @DateTime.Now.Year - 7apex Tours. Горы зовут.
                 </p>
             </div>
         </div>
     </footer>
 
-    <!-- СКРИПТЫ -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    <!-- ИСПРАВЛЕНИЕ: ДОБАВЛЕН БЛОК ДЛЯ ВАЛИДАЦИИ ФОРМ -->
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

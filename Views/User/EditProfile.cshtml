@@ -1,0 +1,91 @@
+﻿@model Apex7.Models.EditProfileViewModel
+
+@{
+    ViewData["Title"] = "Редактирование профиля";
+}
+
+<div class="container py-5 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+
+            <div class="mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2">
+                        <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Мой профиль</a></li>
+                        <li class="breadcrumb-item active small" aria-current="page">Редактирование</li>
+                    </ol>
+                </nav>
+                <h2 class="fw-800 text-uppercase m-0">Настройки <span class="text-primary">профиля</span></h2>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+                <form asp-action="EditProfile" method="post">
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger small fw-bold text-uppercase mb-3"></div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase ls-1 text-muted">Ваше имя</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-secondary-subtle rounded-start-3">
+                                <i class="bi bi-person text-muted"></i>
+                            </span>
+                            @* ДОБАВЛЕН id="fullNameInput" *@
+                            <input asp-for="FullName" id="fullNameInput" class="form-control py-2 border-secondary-subtle rounded-end-3" data-val="true" autocomplete="off" />
+                        </div>
+                        <span asp-validation-for="FullName" class="text-danger small fw-bold mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="form-label small fw-bold text-uppercase ls-1 text-muted">Email адрес</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-secondary-subtle rounded-start-3">
+                                <i class="bi bi-envelope text-muted"></i>
+                            </span>
+                            <input asp-for="Email" type="email" class="form-control py-2 border-secondary-subtle rounded-end-3" data-val="true" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small fw-bold mt-1 d-block"></span>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <a asp-action="Index" class="btn btn-light rounded-pill px-4 py-2 fw-bold w-50">Отмена</a>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm w-50">
+                            Сохранить
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    @* ДОБАВЛЕН ТОТ САМЫЙ СКРИПТ *@
+    <script>
+        // Блокировка ввода цифр и спецсимволов в поле ФИО
+        document.getElementById('fullNameInput').addEventListener('input', function (e) {
+            // Регулярное выражение: всё, что НЕ буквы (RU/EN), пробел или дефис
+            const regex = /[^a-zA-Zа-яА-ЯёЁ\s\-]/g;
+            // Заменяем запрещенные символы на пустоту прямо при вводе
+            this.value = this.value.replace(regex, '');
+        });
+    </script>
+}
+
+<style>
+    .fw-800 {
+        font-weight: 800;
+    }
+
+    .ls-1 {
+        letter-spacing: 1px;
+    }
+
+    /* Красная рамка при ошибке */
+    .input-validation-error {
+        border-color: #dc3545 !important;
+        background-color: #fff8f8;
+    }
+</style>

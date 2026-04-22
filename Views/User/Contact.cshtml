@@ -1,0 +1,88 @@
+﻿@model Apex7.Data.Entities.Feedback
+
+@{
+    ViewData["Title"] = "Обратная связь";
+}
+
+@* Фоновое изображение (баннер) сверху *@
+<div class="position-relative bg-dark text-white text-center py-5 mb-5" style="background: url('/images/contact-bg.jpg') center/cover; min-height: 250px; display: flex; align-items: center; justify-content: center;">
+    <div class="position-absolute top-0 start-0 w-100 h-100 bg-black opacity-50"></div>
+    <div class="position-relative" style="z-index: 2;">
+        <h1 class="fw-800 text-uppercase display-5 tracking-tight">ОБРАТНАЯ СВЯЗЬ</h1>
+        <p class="lead opacity-75">Есть вопросы? Напишите нам!</p>
+    </div>
+</div>
+
+<div class="container pb-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+
+            @* Уведомление об успешной отправке *@
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success rounded-0 border-0 border-start border-success border-4 shadow-sm mb-4">
+                    <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+                </div>
+            }
+
+            @* Сама форма *@
+            <form asp-action="SendFeedback" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3 fw-bold"></div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-uppercase ls-1">ИМЯ</label>
+                    @* УБРАЛИ REQUIRED ОТСЮДА *@
+                    <input asp-for="Name" class="form-control rounded-0 py-2 border-dark" />
+                    <span asp-validation-for="Name" class="text-danger small fw-bold"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-uppercase ls-1">EMAIL</label>
+                    @* УБРАЛИ REQUIRED ОТСЮДА *@
+                    <input asp-for="Email" type="email" class="form-control rounded-0 py-2 border-dark" />
+                    <span asp-validation-for="Email" class="text-danger small fw-bold"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-uppercase ls-1">СООБЩЕНИЕ</label>
+                    @* УБРАЛИ REQUIRED ОТСЮДА *@
+                    <textarea asp-for="Message" class="form-control rounded-0 border-dark" rows="6"></textarea>
+                    <span asp-validation-for="Message" class="text-danger small fw-bold"></span>
+                </div>
+
+                <button type="submit" class="btn btn-dark w-100 py-3 text-uppercase fw-bold rounded-1 hover-lift">
+                    ОТПРАВИТЬ СООБЩЕНИЕ
+                </button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    .fw-800 {
+        font-weight: 800;
+    }
+
+    .ls-1 {
+        letter-spacing: 1px;
+    }
+
+    .hover-lift {
+        transition: transform 0.2s;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-2px);
+        }
+
+    /* ДОБАВЛЕНО: Красная рамка для полей с ошибкой */
+    .input-validation-error {
+        border-color: #dc3545 !important;
+        background-color: #fff8f8;
+    }
+</style>

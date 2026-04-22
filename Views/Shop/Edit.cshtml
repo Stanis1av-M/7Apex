@@ -2,108 +2,146 @@
 
 <div class="container py-5 mt-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <!-- Заголовок и кнопка удаления -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="text-uppercase fw-black mb-0 ls-1" style="font-size: 1.6rem;">
-                    Редактирование: <span class="text-muted fw-normal">@Model.Name</span>
-                </h2>
+        <div class="col-xl-10 col-lg-11">
 
-                <form asp-action="Delete" method="post" onsubmit="return confirm('Удалить этот товар навсегда?');">
+            <!-- Шапка с кнопкой назад и удалением -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <a asp-action="Index" class="text-decoration-none text-muted small fw-bold text-uppercase ls-1">
+                        <i class="bi bi-arrow-left me-1"></i> Назад к витрине
+                    </a>
+                    <h2 class="text-uppercase fw-black mb-0 mt-2 ls-1" style="font-size: 1.8rem;">
+                        <span class="text-primary">Редактирование:</span> @Model.Name
+                    </h2>
+                </div>
+
+                <form asp-action="Delete" method="post" onsubmit="return confirm('Вы уверены, что хотите безвозвратно удалить этот товар?');">
                     <input type="hidden" name="id" value="@Model.ProductId" />
-                    <button type="submit" class="btn btn-outline-danger btn-sm text-uppercase fw-bold ls-1 rounded-pill px-4">
-                        <i class="bi bi-trash3 me-1"></i> Удалить
+                    <button type="submit" class="btn btn-outline-danger btn-sm text-uppercase fw-bold ls-1 rounded-3 px-3 py-2">
+                        <i class="bi bi-trash3-fill me-1"></i> Удалить товар
                     </button>
                 </form>
             </div>
 
-            <!-- Основная форма -->
-            <form asp-action="Edit" method="post" enctype="multipart/form-data" class="bg-white p-5 border-0 shadow-lg" style="border-radius: 20px;">
+            <!-- Форма -->
+            <form asp-action="Edit" method="post" enctype="multipart/form-data" class="bg-white p-4 p-md-5 shadow-sm rounded-4 border">
                 <input type="hidden" asp-for="ProductId" />
 
-                <div asp-validation-summary="ModelOnly" class="text-danger small fw-bold mb-4"></div>
-
-                <div class="row g-4 mb-4">
-                    <!-- НАЗВАНИЕ (Лимит 30 символов) -->
-                    <div class="col-md-6">
-                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Название товара (до 30 симв.) <span class="text-danger">*</span></label>
-                        <input asp-for="Name" class="form-control form-control-lg bg-light border-0" maxlength="30" placeholder="Введите название" required />
-                        <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                <!-- Глобальные ошибки -->
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4">
+                        <i class="bi bi-exclamation-circle-fill me-2"></i> Проверьте правильность заполнения полей ниже.
                     </div>
-                    <!-- АРТИКУЛ (Лимит 30 символов) -->
-                    <div class="col-md-6">
-                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Артикул (до 30 симв.)</label>
-                        <input asp-for="Article" class="form-control form-control-lg bg-light border-0" maxlength="30" placeholder="TENT-001" />
-                        <span asp-validation-for="Article" class="text-danger small mt-1 d-block"></span>
+                }
+
+                <!-- СЕКЦИЯ 1: Основная информация -->
+                <div class="row g-4 mb-5">
+                    <div class="col-12 border-bottom pb-2">
+                        <h5 class="text-uppercase fw-bold mb-0 small text-muted ls-2"><i class="bi bi-info-circle me-2"></i>Основная информация</h5>
+                    </div>
+                    <div class="col-md-7">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Название товара <span class="text-danger">*</span></label>
+                        <input asp-for="Name" class="form-control form-control-lg bg-light border-0 shadow-none" placeholder="Введите название" required />
+                        <span asp-validation-for="Name" class="text-danger small fw-bold mt-1 d-block"></span>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Артикул</label>
+                        <input asp-for="Article" class="form-control form-control-lg bg-light border-0 shadow-none" placeholder="Напр: TENT-001" required />
+                        <span asp-validation-for="Article" class="text-danger small fw-bold mt-1 d-block"></span>
                     </div>
                 </div>
 
-                <div class="row g-4 mb-4">
-                    <!-- КАТЕГОРИЯ -->
-                    <div class="col-md-6">
-                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Категория (ID)</label>
-                        <input asp-for="CategoryId" type="number" class="form-control form-control-lg bg-light border-0" required />
-                        <span asp-validation-for="CategoryId" class="text-danger small mt-1 d-block"></span>
+                <!-- СЕКЦИЯ 2: Классификация -->
+                <div class="row g-4 mb-5">
+                    <div class="col-12 border-bottom pb-2">
+                        <h5 class="text-uppercase fw-bold mb-0 small text-muted ls-2"><i class="bi bi-tags me-2"></i>Классификация</h5>
                     </div>
-                    <!-- ПРОИЗВОДИТЕЛЬ (ВЫПАДАЮЩИЙ СПИСОК) -->
-                    <div class="col-md-6">
-                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Производитель</label>
-                        <select asp-for="ManufacturerId" class="form-select form-select-lg bg-light border-0 fw-bold"
-                                asp-items="@(new SelectList(ViewBag.Manufacturers, "ManufactureId", "Name"))" style="font-size: 0.9rem;">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Категория</label>
+                        <select asp-for="CategoryId" class="form-select form-select-lg bg-light border-0 shadow-none fw-bold" asp-items="ViewBag.Categories">
+                            <option value="">-- Выберите --</option>
                         </select>
-                        <span asp-validation-for="ManufacturerId" class="text-danger small mt-1 d-block"></span>
+                        <span asp-validation-for="CategoryId" class="text-danger small fw-bold mt-1 d-block"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Производитель</label>
+                        <select asp-for="ManufacturerId" class="form-select form-select-lg bg-light border-0 shadow-none fw-bold" asp-items="ViewBag.Manufacturers">
+                            <option value="">-- Выберите --</option>
+                        </select>
+                        <span asp-validation-for="ManufacturerId" class="text-danger small fw-bold mt-1 d-block"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Поставщик</label>
+                        <select asp-for="SupplierId" class="form-select form-select-lg bg-light border-0 shadow-none fw-bold" asp-items="ViewBag.Suppliers">
+                            <option value="">-- Выберите --</option>
+                        </select>
+                        <span asp-validation-for="SupplierId" class="text-danger small fw-bold mt-1 d-block"></span>
                     </div>
                 </div>
 
-                <div class="row g-4 mb-4">
-                    <!-- ЦЕНА (Лимит 5 цифр) -->
-                    <div class="col-md-3">
-                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Цена (₽)</label>
-                        <input asp-for="Price" type="number" step="0.01" class="form-control form-control-lg bg-light border-0 fw-bold"
-                               oninput="if(this.value.length > 5) this.value = this.value.slice(0, 5);" required />
-                        <span asp-validation-for="Price" class="text-danger small mt-1 d-block"></span>
+                <!-- СЕКЦИЯ 3: Цены и Склад -->
+                <div class="row g-4 mb-5 p-4 rounded-4 bg-light border-0">
+                    <div class="col-12 mb-2">
+                        <h5 class="text-uppercase fw-bold mb-0 small text-dark ls-2"><i class="bi bi-cash-stack me-2"></i>Коммерческие данные</h5>
                     </div>
-                    <!-- СТАРАЯ ЦЕНА (Лимит 5 цифр) -->
                     <div class="col-md-3">
-                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Старая цена</label>
-                        <input asp-for="OldPrice" type="number" step="0.01" class="form-control form-control-lg bg-light border-0 text-muted"
-                               oninput="if(this.value.length > 5) this.value = this.value.slice(0, 5);" />
+                        <label class="form-label small fw-bold text-uppercase">Цена (₽) <span class="text-danger">*</span></label>
+                        <input asp-for="Price" type="number" step="0.01" min="0" max="1000000" class="form-control form-control-lg bg-white border-0 shadow-sm fw-bold text-primary" required />
+                        <span asp-validation-for="Price" class="text-danger small fw-bold mt-1 d-block"></span>
                     </div>
-                    <!-- СКИДКА (Лимит 3 цифры - до 100%) -->
                     <div class="col-md-3">
-                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Скидка (%)</label>
-                        <input asp-for="Discount" type="number" class="form-control form-control-lg bg-light border-0"
-                               oninput="if(this.value.length > 3) this.value = this.value.slice(0, 3);" />
+                        <label class="form-label small fw-bold text-uppercase">Старая цена</label>
+                        <input asp-for="OldPrice" type="number" step="0.01" min="0" max="1000000" class="form-control form-control-lg bg-white border-0 shadow-sm text-muted" />
+                        <span asp-validation-for="OldPrice" class="text-danger small fw-bold mt-1 d-block"></span>
                     </div>
-                    <!-- ОСТАТОК (Лимит 5 цифр) -->
                     <div class="col-md-3">
-                        <label class="small fw-bold text-uppercase ls-1 mb-2 text-danger">Остаток шт. <span class="text-danger">*</span></label>
-                        <input asp-for="Stock" type="number" class="form-control form-control-lg border-danger text-danger fw-bold"
-                               style="background-color: #fff5f5;" oninput="if(this.value.length > 5) this.value = this.value.slice(0, 5);" required />
-                        <span asp-validation-for="Stock" class="text-danger small mt-1 d-block"></span>
+                        <label class="form-label small fw-bold text-uppercase text-warning">Скидка (%)</label>
+                        <input asp-for="Discount" type="number" min="0" max="100" class="form-control form-control-lg bg-white border-0 shadow-sm fw-bold text-warning" />
+                        <span asp-validation-for="Discount" class="text-danger small fw-bold mt-1 d-block"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-uppercase text-danger">Остаток (макс 99) *</label>
+                        <input asp-for="Stock" type="number" min="0" max="99" class="form-control form-control-lg bg-white border-danger shadow-sm fw-bold text-danger" required />
+                        <span asp-validation-for="Stock" class="text-danger small fw-bold mt-1 d-block"></span>
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <label class="small fw-bold text-uppercase ls-1 mb-2 text-muted">Описание</label>
-                    <textarea asp-for="Description" class="form-control bg-light border-0 p-3" rows="3" placeholder="Краткое описание товара..."></textarea>
+                <!-- СЕКЦИЯ 4: Описание и Медиа -->
+                <div class="row g-4 mb-5">
+                    <div class="col-md-8">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Описание товара (макс. 250 символов)</label>
+                        <textarea asp-for="Description" class="form-control bg-light border-0 shadow-none p-3" rows="5" maxlength="250" placeholder="Расскажите о преимуществах товара..."></textarea>
+                        <div class="text-end mt-1"><small id="charCount" class="text-muted">0 / 250</small></div>
+                        <span asp-validation-for="Description" class="text-danger small fw-bold mt-1 d-block"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Изображение</label>
+                        <div class="p-3 bg-light rounded-4 border-dashed text-center h-100 d-flex flex-column align-items-center justify-content-center">
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <img src="@Model.ImageUrl" class="rounded-3 mb-3 shadow-sm" style="width: 100px; height: 100px; object-fit: cover;" id="imgPreview" />
+                            }
+                            else
+                            {
+                                <i class="bi bi-image text-muted fs-1 mb-2"></i>
+                            }
+                            <input type="file" name="imageFile" id="fileInput" class="form-control form-control-sm bg-white border-0" accept="image/*" />
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-5 p-4 rounded" style="background-color: #f8f9fa; border: 1px dashed #dee2e6;">
-                    <label class="small fw-bold text-uppercase ls-1 mb-2 text-dark"><i class="bi bi-image me-2"></i>Сменить фото</label>
-                    <input type="file" name="imageFile" class="form-control bg-white border-0" accept="image/*" />
-                </div>
-
+                <!-- Футер формы -->
                 <div class="d-flex align-items-center justify-content-between pt-4 border-top">
                     <div class="form-check form-switch fs-5">
-                        <input asp-for="IsVisible" class="form-check-input" type="checkbox" id="visibleCheck" role="switch">
-                        <label class="form-check-label fs-6 fw-bold text-uppercase ls-1 ms-2" for="visibleCheck" style="cursor: pointer;">
-                            В продаже
+                        <input asp-for="IsVisible" class="form-check-input custom-switch" type="checkbox" id="visibleCheck" role="switch">
+                        <label class="form-check-label fs-6 fw-bold text-uppercase ls-1 ms-2 mt-1" for="visibleCheck" style="cursor: pointer;">
+                            Отображать на сайте
                         </label>
                     </div>
 
-                    <button type="submit" class="btn btn-dark btn-lg px-5 text-uppercase fw-bold ls-1 rounded-pill shadow">
-                        Сохранить изменения
+                    <button type="submit" class="btn btn-dark btn-lg px-5 py-3 text-uppercase fw-bold ls-2 rounded-pill shadow-lg hover-scale">
+                        Сохранить все изменения
                     </button>
                 </div>
             </form>
@@ -115,4 +153,79 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        // Блокировка букв "e", "-", "+" в числовых полях
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('keydown', function(e) {
+                if (['e', 'E', '-', '+'].includes(e.key)) e.preventDefault();
+            });
+        });
+
+        // Счетчик символов для описания
+        const textarea = document.querySelector('textarea[name="Description"]');
+        const charCount = document.getElementById('charCount');
+
+        const updateCount = () => {
+            charCount.textContent = `${textarea.value.length} / 250`;
+            charCount.className = textarea.value.length >= 240 ? 'text-danger fw-bold' : 'text-muted';
+        };
+
+        textarea.addEventListener('input', updateCount);
+        updateCount();
+
+        // Предпросмотр изображения
+        document.getElementById('fileInput').onchange = evt => {
+            const [file] = evt.target.files;
+            if (file) {
+                let img = document.getElementById('imgPreview');
+                if (!img) {
+                    // Создаем если нет
+                    img = document.createElement('img');
+                    img.id = 'imgPreview';
+                    img.className = 'rounded-3 mb-3 shadow-sm';
+                    img.style.cssText = 'width: 100px; height: 100px; object-fit: cover;';
+                    evt.target.parentElement.prepend(img);
+                }
+                img.src = URL.createObjectURL(file);
+            }
+        };
+    </script>
 }
+
+<style>
+    .ls-2 {
+        letter-spacing: 2px;
+    }
+
+    .fw-black {
+        font-weight: 900;
+    }
+
+    .border-dashed {
+        border: 2px dashed #dee2e6;
+    }
+
+    .custom-switch {
+        width: 3.5rem !important;
+        height: 1.8rem !important;
+        cursor: pointer;
+    }
+
+    .hover-scale {
+        transition: transform 0.2s;
+    }
+
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+
+    .form-control-lg, .form-select-lg {
+        font-size: 1rem;
+        border-radius: 12px;
+    }
+
+    .bg-light {
+        background-color: #f9fbfd !important;
+    }
+</style>

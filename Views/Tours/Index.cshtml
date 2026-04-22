@@ -8,7 +8,6 @@
 </section>
 
 <div class="container py-5 mt-n5">
-    <!-- g-5 добавляет те самые красивые отступы между карточками -->
     <div class="row g-5">
         @foreach (var tour in Model)
         {
@@ -34,7 +33,8 @@
                             <div class="mb-3">
                                 <span class="new-price">от 140 000 руб</span>
                             </div>
-                            <a href="#" class="btn-tour-tan w-100">Подробнее о программе</a>
+                            @* ИСПРАВЛЕНИЕ: Добавили asp-controller и asp-action вместо href="#" *@
+                            <a asp-controller="Home" asp-action="CallInfo" class="btn-tour-tan w-100">Подробнее о программе</a>
                         </div>
                     </div>
                 </div>

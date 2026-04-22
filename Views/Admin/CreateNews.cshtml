@@ -1,0 +1,47 @@
+﻿@model Apex7.Data.Entities.News
+
+<div class="container py-5 mt-4" style="max-width: 900px;">
+    <div class="card border-0 shadow-lg rounded-4 p-4">
+        <h2 class="fw-800 text-uppercase mb-4">Создать <span class="text-primary">Новость</span></h2>
+
+        <form asp-action="CreateNews" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Заголовок экспедиции</label>
+                <input asp-for="Title" class="form-control rounded-3"
+                       placeholder="Введите название..."
+                       maxlength="100" /> <span asp-validation-for="Title" class="text-danger small fw-bold"></span>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Главное фото (Обложка)</label>
+                    <input type="file" name="image1" class="form-control rounded-3" accept="image/*" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Дополнительное фото</label>
+                    <input type="file" name="image2" class="form-control rounded-3" accept="image/*" />
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Текст новости / Описание</label>
+                <textarea asp-for="Content" class="form-control rounded-3"
+                          rows="4"
+                          placeholder="Расскажите об экспедиции..."
+                          maxlength="350"></textarea> <span asp-validation-for="Content" class="text-danger small fw-bold"></span>
+                <div class="text-muted small text-end">Максимум 350 символов</div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a asp-action="NewsList" class="btn btn-light rounded-pill px-4 border">Отмена</a>
+                <button type="submit" class="btn btn-primary rounded-pill px-5 shadow-sm hover-lift">Опубликовать</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

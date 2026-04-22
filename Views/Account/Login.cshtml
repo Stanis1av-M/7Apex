@@ -3,42 +3,90 @@
 @{
     ViewData["Title"] = "Вход";
 }
-@if (ViewBag.AuthMessage != null)
-{
-    <div class="alert alert-warning border-0 rounded-0 small fw-bold text-uppercase ls-1 py-3 mb-4 shadow-sm" role="alert">
-        <i class="bi bi-exclamation-circle me-2"></i> @ViewBag.AuthMessage
-    </div>
-}
-<div class="container flex-grow-1 d-flex align-items-center justify-content-center py-5">
+
+<div class="container flex-grow-1 d-flex flex-column align-items-center justify-content-center py-5">
+
+    @* СООБЩЕНИЕ О НЕОБХОДИМОСТИ АВТОРИЗАЦИИ (из корзины) *@
+    @if (ViewBag.AuthMessage != null)
+    {
+        <div class="col-12 col-md-5 col-lg-4 mb-4">
+            <div class="alert alert-warning border border-dark rounded-0 small fw-bold text-uppercase ls-1 py-3 shadow-sm m-0" role="alert">
+                <i class="bi bi-exclamation-circle-fill me-2"></i> @ViewBag.AuthMessage
+            </div>
+        </div>
+    }
+
     <div class="col-12 col-md-5 col-lg-4">
         <div class="text-center mb-5">
-            <h6 class="text-muted text-uppercase ls-2 small mb-2">Добро пожаловать</h6>
+            <h6 class="text-muted text-uppercase ls-2 small mb-2">7apex tours</h6>
             <h1 class="fw-black text-uppercase ls-1">Вход в аккаунт</h1>
         </div>
 
-        <form asp-action="Login" method="post" class="bg-white p-4 border shadow-sm">
-            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+        @* Добавили ReturnUrl, чтобы после логина пользователь вернулся туда, откуда пришел *@
+        <form asp-action="Login" asp-route-returnUrl="@ViewBag.ReturnUrl" method="post" class="bg-white p-4 border border-dark shadow-sm">
+
+            @* Общие ошибки (например, "Неверный пароль") *@
+            <div asp-validation-summary="ModelOnly" class="text-danger small fw-bold text-uppercase mb-3"></div>
 
             <div class="mb-3">
-                <label asp-for="Email" class="small text-uppercase fw-bold ls-1 mb-1">Электронная почта</label>
+                <label asp-for="Email" class="small text-uppercase fw-bold ls-1 mb-1 d-block">Электронная почта</label>
                 <input asp-for="Email" class="form-control rounded-0 border-dark shadow-none py-2" placeholder="email@example.com" />
-                <span asp-validation-for="Email" class="text-danger small"></span>
+                <span asp-validation-for="Email" class="text-danger small fw-bold text-uppercase mt-1 d-block" style="font-size: 0.65rem;"></span>
             </div>
 
             <div class="mb-4">
-                <label asp-for="Password" class="small text-uppercase fw-bold ls-1 mb-1">Пароль</label>
-                <input asp-for="Password" type="password" class="form-control rounded-0 border-dark shadow-none py-2" />
-                <span asp-validation-for="Password" class="text-danger small"></span>
+                <label asp-for="Password" class="small text-uppercase fw-bold ls-1 mb-1 d-block">Пароль</label>
+                <input asp-for="Password" type="password" class="form-control rounded-0 border-dark shadow-none py-2" placeholder="••••••••" />
+                <span asp-validation-for="Password" class="text-danger small fw-bold text-uppercase mt-1 d-block" style="font-size: 0.65rem;"></span>
             </div>
 
-            <button type="submit" class="btn btn-dark w-100 py-3 text-uppercase fw-bold ls-1 mb-3">
-                Войти
+            <button type="submit" class="btn btn-dark w-100 py-3 text-uppercase fw-bold ls-1 mb-3 rounded-0 transition-3">
+                Войти в систему
             </button>
 
-            <div class="text-center mt-3">
-                <p class="small text-muted mb-0">Ещё нет аккаунта?</p>
-                <a asp-action="Register" class="text-dark fw-bold small text-uppercase text-decoration-none border-bottom border-dark pb-1">Создать профиль</a>
+            <div class="text-center mt-3 pt-3 border-top border-light">
+                <p class="small text-muted mb-2 text-uppercase ls-1" style="font-size: 0.7rem;">Ещё нет аккаунта?</p>
+                <a asp-action="Register" class="text-dark fw-bold small text-uppercase text-decoration-none border-bottom border-2 border-dark pb-1 hover-opacity">
+                    Создать профиль
+                </a>
             </div>
         </form>
     </div>
 </div>
+
+@section Scripts {
+    @* Подключаем скрипты, чтобы ошибки появлялись мгновенно без перезагрузки страницы *@
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    /* Дополнительные штрихи для твоего стиля */
+    .fw-black {
+        font-weight: 900;
+    }
+
+    .ls-1 {
+        letter-spacing: 1px;
+    }
+
+    .ls-2 {
+        letter-spacing: 2px;
+    }
+
+    .transition-3 {
+        transition: 0.3s;
+    }
+
+    .btn-dark:hover {
+        background-color: #333;
+    }
+
+    .form-control:focus {
+        border-color: #000 !important;
+        background-color: #fcfcfc;
+    }
+
+    .hover-opacity:hover {
+        opacity: 0.7;
+    }
+</style>

@@ -2,54 +2,158 @@
     ViewData["Title"] = "Панель управления";
 }
 
-<div class="container py-5 mt-5">
-    <h1 class="fw-black text-uppercase mb-5">Панель управления</h1>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+<div class="container py-5 mt-4" style="font-family: 'Inter', sans-serif;">
+    <div class="mb-5">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item active small" aria-current="page">Админ-панель</li>
+            </ol>
+        </nav>
+        <h1 class="fw-800 text-uppercase m-0 tracking-tight" style="letter-spacing: -1px; font-size: 2.5rem;">
+            Система <span class="text-primary">Управления</span>
+        </h1>
+    </div>
 
     <div class="row g-4">
-        <!-- Заказы -->
+        <!-- 1. ЗАКАЗЫ -->
         <div class="col-md-4">
-            <a asp-controller="Manager" asp-action="Orders" class="text-decoration-none">
-                <div class="card h-100 p-4 border-0 shadow-sm text-center">
-                    <i class="bi bi-box-seam display-3 text-dark"></i>
-                    <h5 class="fw-bold mt-3">ЗАКАЗЫ</h5>
-                    <p class="small text-muted">Изменение статусов и обработка заявок</p>
+            <a asp-controller="Admin" asp-action="Orders" class="text-decoration-none">
+                <div class="card h-100 p-4 border-0 shadow-sm text-center hover-lift rounded-4">
+                    <div class="icon-circle bg-primary-subtle text-primary mx-auto mb-3">
+                        <i class="bi bi-box-seam fs-2"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark text-uppercase">Заказы</h5>
+                    <p class="small text-muted mb-0">Обработка заявок и изменение статусов оплаты</p>
                 </div>
             </a>
         </div>
 
-        <!-- Товары -->
+        <!-- 2. СПИСОК ТОВАРОВ -->
         <div class="col-md-4">
             <a asp-controller="Shop" asp-action="Index" class="text-decoration-none">
-                <div class="card h-100 p-4 border-0 shadow-sm text-center">
-                    <i class="bi bi-tag display-3 text-dark"></i>
-                    <h5 class="fw-bold mt-3">ТОВАРЫ</h5>
-                    <p class="small text-muted">Управление ассортиментом и ценами</p>
+                <div class="card h-100 p-4 border-0 shadow-sm text-center hover-lift rounded-4">
+                    <div class="icon-circle bg-success-subtle text-success mx-auto mb-3">
+                        <i class="bi bi-tag fs-2"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark text-uppercase">Витрина</h5>
+                    <p class="small text-muted mb-0">Управление ассортиментом магазина и ценами</p>
                 </div>
             </a>
         </div>
 
-        <!-- Пользователи (только для админа) -->
+        <!-- 3. ОБРАЩЕНИЯ -->
+        <div class="col-md-4">
+            <a asp-controller="Admin" asp-action="Feedbacks" class="text-decoration-none">
+                <div class="card h-100 p-4 border-0 shadow-sm text-center hover-lift rounded-4">
+                    <div class="icon-circle bg-purple-subtle text-purple mx-auto mb-3">
+                        <i class="bi bi-chat-left-dots fs-2"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark text-uppercase">Обращения</h5>
+                    <p class="small text-muted mb-0">Ответы на вопросы пользователей и тикеты</p>
+                </div>
+            </a>
+        </div>
+
+        @* --- РАЗДЕЛЫ ТОЛЬКО ДЛЯ АДМИНИСТРАТОРА --- *@
         @if (User.IsInRole("Администратор"))
         {
+            <!-- 4. ДОБАВЛЕНИЕ ТОВАРА (НОВАЯ КАРТОЧКА) -->
+            <div class="col-md-4">
+                <a asp-controller="Shop" asp-action="Create" class="text-decoration-none">
+                    <div class="card h-100 p-4 border-0 shadow-sm text-center hover-lift rounded-4 border-info-subtle" style="border: 1px solid #e0f7fa !important;">
+                        <div class="icon-circle bg-info-subtle text-info mx-auto mb-3">
+                            <i class="bi bi-plus-square-dotted fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark text-uppercase">Добавить товар</h5>
+                        <p class="small text-muted mb-0">Быстрое создание новой позиции в каталоге</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 5. НОВОСТИ / ЭКСПЕДИЦИИ -->
+            <div class="col-md-4">
+                <a asp-controller="Admin" asp-action="NewsList" class="text-decoration-none">
+                    <div class="card h-100 p-4 border-0 shadow-sm text-center hover-lift rounded-4">
+                        <div class="icon-circle bg-warning-subtle text-warning mx-auto mb-3">
+                            <i class="bi bi-newspaper fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark text-uppercase">Экспедиции</h5>
+                        <p class="small text-muted mb-0">Публикация новостей о походах на главной</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 6. ПОЛЬЗОВАТЕЛИ -->
             <div class="col-md-4">
                 <a asp-controller="Admin" asp-action="Users" class="text-decoration-none">
-                    <div class="card h-100 p-4 border-0 shadow-sm text-center bg-dark text-white">
-                        <i class="bi bi-people display-3 text-warning"></i>
-                        <h5 class="fw-bold mt-3">ПОЛЬЗОВАТЕЛИ</h5>
-                        <p class="small text-white-50">Управление учетными записями</p>
+                    <div class="card h-100 p-4 border-0 shadow-sm text-center hover-lift rounded-4 bg-dark text-white">
+                        <div class="icon-circle bg-white bg-opacity-10 text-warning mx-auto mb-3">
+                            <i class="bi bi-shield-lock fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold text-uppercase">Пользователи</h5>
+                        <p class="small text-white-50 mb-0">Управление ролями и блокировка аккаунтов</p>
                     </div>
                 </a>
             </div>
         }
     </div>
 </div>
+
 <style>
+    body {
+        background-color: #f4f7f9;
+    }
+
+    .fw-800 {
+        font-weight: 800;
+    }
+
+    .icon-circle {
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     .hover-lift {
-        transition: 0.3s;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
         .hover-lift:hover {
             transform: translateY(-10px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
         }
+
+    /* Цвета */
+    .bg-primary-subtle {
+        background-color: #e7f0ff;
+    }
+
+    .bg-success-subtle {
+        background-color: #e6fcf5;
+    }
+
+    .bg-warning-subtle {
+        background-color: #fff9db;
+    }
+
+    .bg-purple-subtle {
+        background-color: #f3e8ff;
+    }
+
+    .text-purple {
+        color: #8b5cf6;
+    }
+
+    .bg-info-subtle {
+        background-color: #e0f7fa;
+    }
+
+    .text-info {
+        color: #00acc1;
+    }
 </style>

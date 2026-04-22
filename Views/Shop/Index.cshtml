@@ -1,6 +1,7 @@
-﻿@model IEnumerable<Apex7.Data.Entities.Product>
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@model IEnumerable<Apex7.Data.Entities.Product>
 
-<!-- 1. Шапка (оставляем без изменений) -->
+<!-- 1. Шапка -->
 <section class="tour-hero">
     <div class="container text-center">
         <h6 class="text-uppercase mb-2 fw-bold ls-2 small text-muted">Экипировка</h6>
@@ -9,116 +10,207 @@
 </section>
 
 <div class="container mt-5 mb-5">
-    <!-- 2. Панель поиска (оставляем без изменений) -->
+
+    @* --- КНОПКА ДОБАВЛЕНИЯ ДЛЯ АДМИНА --- *@
+    @if (User.IsInRole("Администратор"))
+    {
+        <div class="position-relative" style="z-index: 1060; margin-bottom: -25px;">
+            <div class="d-flex justify-content-end">
+                <a asp-action="Create" class="btn btn-dark btn-lg px-4 py-2 rounded-pill shadow-lg fw-bold text-uppercase ls-1 hover-scale" style="font-size: 0.8rem;">
+                    <i class="bi bi-plus-lg me-2"></i> Добавить товар
+                </a>
+            </div>
+        </div>
+    }
+
+    <!-- 2. Панель поиска -->
     <div class="search-panel mb-5">
-        <form asp-action="Index" method="get" class="row g-3 align-items-center">
-            <div class="col-lg-6">
+        @* УБРАЛИ needs-validation, так как будем проверять вручную *@
+        <form asp-action="Index" method="get" id="searchForm" class="row g-3 align-items-center" novalidate>
+            <div class="col-lg-5">
                 <div class="search-input-wrapper">
                     <i class="bi bi-search search-icon-inner"></i>
-                    <input type="text" name="searchString" value="@ViewBag.CurrentSearch" class="search-field-custom" placeholder="Что вы ищете?">
+                    @* УБРАЛИ required *@
+                    <input type="text"
+                           name="searchString"
+                           id="searchField"
+                           value="@ViewBag.CurrentSearch"
+                           class="search-field-custom"
+                           placeholder="Что вы ищете?"
+                           maxlength="50"
+                           autocomplete="off">
+                    <div id="searchError" class="invalid-feedback position-absolute ps-5" style="bottom: -22px; font-size: 0.7rem; font-weight: 600; display: none;">
+                        Введите минимум 2 символа для текстового поиска
+                    </div>
                 </div>
             </div>
-            <div class="col-lg-4">
-                <select name="categoryId" class="search-select-custom text-uppercase fw-bold" asp-items="@(new SelectList(ViewBag.Categories, "CategoryId", "Name", ViewBag.SelectedCategory))">
+            <div class="col-lg-3">
+                <select name="categoryId" class="search-select-custom text-uppercase fw-bold"
+                        asp-items="@(ViewBag.Categories as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>()))">
                     <option value="">ВСЕ КАТЕГОРИИ</option>
                 </select>
             </div>
             <div class="col-lg-2">
-                <button type="submit" class="btn-search-main">Найти</button>
+                <button type="submit" class="btn-search-main w-100 shadow-sm">Найти</button>
+            </div>
+            <div class="col-lg-2 text-center">
+                @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch) || ViewBag.SelectedCategory != null)
+                {
+                    <a asp-action="Index" class="btn btn-link text-danger small fw-bold text-decoration-none text-uppercase ls-1" style="font-size: 0.7rem;">
+                        <i class="bi bi-x-circle me-1"></i> Сбросить
+                    </a>
+                }
             </div>
         </form>
     </div>
 
     <!-- 3. Сетка товаров -->
-    <div class="row g-5">
-        @foreach (var item in Model)
-        {
-            // ЛОГИКА ДЛЯ МЕНЕДЖЕРА
-            bool isOutOfStock = item.Stock <= 0;
-            bool isHidden = !item.IsVisible;
-            bool isGray = isOutOfStock || isHidden; // Карточка будет серой в обоих случаях
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 bg-light rounded-4 border border-dashed">
+            <i class="bi bi-search text-muted display-1 opacity-25"></i>
+            <h3 class="mt-3 fw-bold">Ничего не найдено</h3>
+            <p class="text-muted">Попробуйте изменить параметры поиска или категорию</p>
+            <a asp-action="Index" class="btn btn-dark rounded-pill px-4 mt-2">Показать все товары</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-5">
+            @foreach (var item in Model)
+            {
+                bool isOutOfStock = item.Stock <= 0;
+                bool isHidden = !item.IsVisible;
+                bool isGray = isOutOfStock || isHidden;
+                string stockClass = isGray ? "out-of-stock" : "";
 
-            string stockClass = isGray ? "out-of-stock" : "";
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="tour-card h-100 @stockClass">
+                        <div class="tour-card-img-wrap shop-img mb-3 position-relative shadow-sm">
+                            <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/images/products/default.jpg" : item.ImageUrl)" class="tour-card-img" alt="@item.Name">
 
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="tour-card h-100 @stockClass">
-
-                    <!-- ФОТО ТОВАРА -->
-                    <div class="tour-card-img-wrap shop-img mb-3 position-relative">
-                        <img src="@(item.ImageUrl ?? "/images/products/default.jpg")" class="tour-card-img" alt="@item.Name">
-
-                        @if (isHidden)
-                        {
-                            <div class="position-absolute top-0 start-0 bg-secondary text-white px-2 py-1 m-2 small fw-bold" style="z-index: 5; font-size: 0.6rem;">
-                                СКРЫТ С САЙТА
-                            </div>
-                        }
-
-                        @if (item.Discount > 0 && !isHidden && !isOutOfStock)
-                        {
-                            <div class="discount-badge">-@item.Discount%</div>
-                        }
-
-                        @* Кнопка избранного (только если товар не скрыт) *@
-                        @if (!isHidden)
-                        {
-                            <form asp-controller="Favorites" asp-action="Toggle" method="post" class="position-absolute top-0 end-0 m-3" style="z-index: 10;">
-                                <input type="hidden" name="productId" value="@item.ProductId" />
-                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                <button type="submit" class="btn-favorite @(item.Discount > 0 ? "with-discount" : "")"><i class="bi bi-heart"></i></button>
-                            </form>
-                        }
-                    </div>
-
-                    <!-- КОНТЕНТ КАРТОЧКИ -->
-                    <div class="px-1 d-flex flex-column flex-grow-1">
-                        <span class="status-badge @(isGray ? "disabled" : "")">
                             @if (isHidden)
                             {
-                                <text>СНЯТ С ПРОДАЖИ</text>
+                                <div class="position-absolute top-0 start-0 bg-secondary text-white px-2 py-1 m-2 small fw-bold rounded-1 shadow-sm" style="z-index: 5; font-size: 0.6rem;">
+                                    СКРЫТ
+                                </div>
                             }
-                            else if (isOutOfStock)
-                            {
 
-                                <text>НЕТ В НАЛИЧИИ</text>
+                            @if (item.Discount > 0 && !isHidden && !isOutOfStock)
+                            {
+                                <div class="discount-badge shadow-sm">-@item.Discount%</div>
                             }
-                            else
+
+                            @if (!isHidden)
                             {
-
-                                <text>В НАЛИЧИИ</text>
-                            }
-                        </span>
-
-                        <h4 class="tour-title" style="font-size: 1.1rem;">@item.Name</h4>
-                        <div class="tour-info-text text-muted small text-uppercase fw-bold ls-1">@item.Manufacturer?.Name</div>
-                        <div class="tour-info-text mb-3">Арт: @item.Article</div>
-
-                        <div class="mt-auto">
-                            <div class="mb-3">
-                                <span class="new-price">@item.Price.ToString("N0") ₽</span>
-                            </div>
-
-                            @* Кнопка корзины только если товар реально доступен *@
-                            @if (!isGray)
-                            {
-                                <form asp-controller="Cart" asp-action="Add" method="post" class="mb-2">
+                                <form asp-controller="Favorites" asp-action="Toggle" method="post" class="position-absolute top-0 end-0 m-3" style="z-index: 10;">
                                     <input type="hidden" name="productId" value="@item.ProductId" />
-                                    <button type="submit" class="btn btn-tour-tan w-100 border-0">В корзину</button>
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                    <button type="submit" class="btn-favorite @(item.Discount > 0 ? "with-discount" : "")" title="В избранное">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
                                 </form>
                             }
+                        </div>
 
-                            @* Кнопка редактирования (Всегда активна для Менеджера) *@
-                            @if (User.IsInRole("Администратор") || User.IsInRole("Менеджер"))
-                            {
-                                <a asp-action="Edit" asp-route-id="@item.ProductId"
-                                   class="btn btn-outline-dark btn-sm w-100 text-uppercase small fw-bold mt-1 admin-edit-btn">
-                                    Редактировать
-                                </a>
-                            }
+                        <div class="px-1 d-flex flex-column flex-grow-1">
+                            <span class="status-badge @(isGray ? "disabled" : "")">
+                                @if (isHidden)
+                                {
+                                    <text>СНЯТ С ПРОДАЖИ</text>
+                                }
+                                else if (isOutOfStock)
+                                {
+
+                                    <text>НЕТ В НАЛИЧИИ</text>
+                                }
+                                else
+                                {
+
+                                    <text>В НАЛИЧИИ</text>
+                                }
+                            </span>
+
+                            <h4 class="tour-title" style="font-size: 1.05rem; line-height: 1.4;">@item.Name</h4>
+                            <div class="text-muted small text-uppercase fw-bold ls-1 mb-1" style="font-size: 0.65rem;">@item.Manufacturer?.Name</div>
+                            <div class="text-muted mb-3" style="font-size: 0.75rem;">Арт: @item.Article</div>
+
+                            <div class="mt-auto">
+                                <div class="mb-3 d-flex align-items-center">
+                                    @if (item.OldPrice.HasValue && item.OldPrice > item.Price)
+                                    {
+                                        <span class="old-price-small text-muted text-decoration-line-through me-2">
+                                            @item.OldPrice.Value.ToString("N0") ₽
+                                        </span>
+                                    }
+                                    <span class="new-price fs-5 text-danger fw-800">@item.Price.ToString("N0") ₽</span>
+                                </div>
+
+                                @if (!isGray)
+                                {
+                                    <form asp-controller="Cart" asp-action="Add" method="post" class="mb-2">
+                                        <input type="hidden" name="productId" value="@item.ProductId" />
+                                        <button type="submit" class="btn btn-tour-tan w-100 border-0 shadow-sm fw-bold">В КОРЗИНУ</button>
+                                    </form>
+                                }
+
+                                @if (User.Identity.IsAuthenticated && (User.IsInRole("Администратор") || User.IsInRole("Менеджер")))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.ProductId"
+                                       class="btn btn-outline-dark btn-sm w-100 text-uppercase small fw-bold mt-1 admin-edit-btn border-2">
+                                        <i class="bi bi-pencil-square me-1"></i> Редактировать
+                                    </a>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        }
-    </div>
+            }
+        </div>
+    }
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            'use strict'
+            var form = document.getElementById('searchForm');
+            var input = document.getElementById('searchField');
+            var error = document.getElementById('searchError');
+
+            form.addEventListener('submit', function (event) {
+                var val = input.value.trim();
+
+                // ЕСЛИ ввели текст, но он меньше 2 символов - блокируем
+                if (val.length > 0 && val.length < 2) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    input.classList.add('is-invalid');
+                    error.style.display = 'block';
+                } else {
+                    // ЕСЛИ поле пустое или >= 2 символов - разрешаем отправку (категории сработают)
+                    input.classList.remove('is-invalid');
+                    error.style.display = 'none';
+                }
+            }, false);
+
+            input.addEventListener('input', function() {
+                if (this.value.trim().length >= 2 || this.value.trim().length === 0) {
+                    this.classList.remove('is-invalid');
+                    error.style.display = 'none';
+                }
+            });
+        })();
+    </script>
+}
+
+<style>
+    .border-dashed {
+        border: 2px dashed #dee2e6 !important;
+    }
+
+    .hover-scale:hover {
+        transform: scale(1.05);
+        transition: 0.3s;
+    }
+</style>

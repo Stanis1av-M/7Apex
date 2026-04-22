@@ -1,45 +1,189 @@
 ﻿@model IEnumerable<Apex7.Data.Entities.Order>
 
-<div class="container py-5 mt-5">
-    <h2 class="text-uppercase fw-black mb-4">Управление заказами</h2>
-    <div class="bg-white p-4 shadow-sm border">
-        <table class="table align-middle">
-            <thead>
-                <tr>
-                    <th>№ Заказа</th>
-                    <th>Клиент</th>
-                    <th>Сумма</th>
-                    <th>Статус</th>
-                    <th>Действие</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var order in Model)
-                {
-                    <tr>
-                        <td>@order.OrderId</td>
-                        <td>@order.User.FullName</td>
-                        <td>@order.TotalAmount.ToString("N0") ₽</td>
-                        <td><span class="badge bg-dark">@order.OrderStatus.Name</span></td>
-                        <td>
-                            <form asp-controller="Manager" asp-action="UpdateOrderStatus" method="post" class="d-flex gap-2">
-                                <input type="hidden" name="orderId" value="@order.OrderId" />
+@{
+    ViewData["Title"] = "Управление заказами";
+}
 
-                                <!-- ДИНАМИЧЕСКИЙ СПИСОК СТАТУСОВ -->
-                                <select name="statusId" class="form-select form-select-sm" style="width: 150px;">
-                                    @foreach (var status in ViewBag.Statuses)
-                                    {
-                                        <option value="@status.OrderStatusID" selected="@(order.OrderStatusId == status.OrderStatusID ? "selected" : null)">
-                                            @status.Name
-                                        </option>
-                                    }
-                                </select>
-                                <button type="submit" class="btn btn-dark btn-sm">Обновить</button>
-                            </form>
-                        </td>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<div class="container py-5 mt-4" style="font-family: 'Inter', sans-serif;">
+
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index" class="text-muted text-decoration-none small">Админ-панель</a></li>
+                    <li class="breadcrumb-item active small" aria-current="page">Заказы</li>
+                </ol>
+            </nav>
+            <h1 class="fw-800 text-uppercase m-0 tracking-tight" style="letter-spacing: -1px; font-size: 2.5rem;">
+                Управление <span class="text-primary">Заказами</span>
+            </h1>
+        </div>
+        <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-dark rounded-pill px-4 fw-bold hover-lift">
+            <i class="bi bi-arrow-left me-2"></i> В панель
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-white border-0 py-4 px-4">
+            <span class="text-muted fw-bold small text-uppercase tracking-wider">Всего заказов: @Model?.Count()</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr class="text-muted small fw-bold">
+                        <th class="ps-4 py-3 border-0">№</th>
+                        <th class="py-3 border-0">КЛИЕНТ</th>
+                        <th class="py-3 border-0" style="min-width: 250px;">СОСТАВ ЗАКАЗА</th>
+                        <th class="py-3 border-0">СУММА</th>
+                        <th class="text-center py-3 border-0">СТАТУС</th>
+                        <th class="pe-4 text-end py-3 border-0">ИЗМЕНИТЬ СТАТУС</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var order in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 py-4">
+                                    <span class="fw-bold text-primary">#@order.OrderId</span>
+                                    <div class="text-muted small" style="font-size: 0.7rem;">@order.CreatedAt.ToString("dd.MM.yyyy HH:mm")</div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">@order.User?.FullName</div>
+                                    <div class="text-muted small">@order.User?.Email</div>
+                                </td>
+                                <td>
+                                    <div class="order-items-list">
+                                        @foreach (var item in order.OrderItems)
+                                        {
+                                            <div class="d-flex justify-content-between align-items-center mb-1 bg-light rounded-2 px-2 py-1" style="font-size: 0.85rem;">
+                                                <span class="text-truncate text-dark fw-medium" style="max-width: 180px;" title="@item.Product?.Name">
+                                                    @item.Product?.Name
+                                                </span>
+                                                <span class="fw-bold text-primary ms-2">x@(item.Quantity)</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-dark">@order.TotalAmount.ToString("N0") ₽</span>
+                                </td>
+                                <td class="text-center">
+                                    @{
+                                        string statusClass = order.OrderStatus?.Name switch
+                                        {
+                                            "Новый" => "status-new",
+                                            "Оплачен" => "status-paid",
+                                            "В пути" => "status-shipping",
+                                            "Завершен" => "status-done",
+                                            _ => "status-default"
+                                        };
+                                    }
+                                    <span class="status-pill @statusClass">@order.OrderStatus?.Name</span>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post" class="d-flex gap-2 justify-content-end">
+                                        <input type="hidden" name="orderId" value="@order.OrderId" />
+                                        <select name="newStatusId" class="form-select rounded-3 shadow-sm border-2 border-light-subtle" style="width: 160px; height: 40px; font-size: 0.9rem;">
+                                            @foreach (var status in ViewBag.Statuses)
+                                            {
+                                                <option value="@status.OrderStatusID" selected="@(order.OrderStatusId == status.OrderStatusID)">
+                                                    @status.Name
+                                                </option>
+                                            }
+                                        </select>
+                                        <button type="submit" class="btn btn-primary rounded-3 shadow-sm px-3 hover-lift" style="height: 40px;">
+                                            <i class="bi bi-check2"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">Заказов пока нет</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+
+<style>
+    body {
+        background-color: #f4f7f9;
+    }
+
+    .fw-800 {
+        font-weight: 800;
+    }
+
+    .status-pill {
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .status-new {
+        background-color: #e9ecef;
+        color: #495057;
+    }
+
+    .status-paid {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .status-shipping {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .status-done {
+        background-color: #cfe2ff;
+        color: #084298;
+    }
+
+    .status-default {
+        background-color: #f8f9fa;
+        color: #333;
+    }
+
+    .order-items-list {
+        max-height: 120px;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+        .order-items-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .order-items-list::-webkit-scrollbar-thumb {
+            background: #dee2e6;
+            border-radius: 10px;
+        }
+
+    .hover-lift {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08) !important;
+        }
+
+    .form-select:focus {
+        border-color: #4a6cf7;
+        box-shadow: 0 0 0 0.25rem rgba(74, 108, 247, 0.1);
+    }
+</style>
